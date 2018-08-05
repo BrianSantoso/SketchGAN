@@ -1,2 +1,2 @@
 # SketchGAN
-Generative Adversarial Network (GAN) for generating pencil sketches
+Deep Convolutional Generative Adversarial Network (DCGAN) for generating pencil sketches
