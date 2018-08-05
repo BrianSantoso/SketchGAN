@@ -189,7 +189,7 @@ class DCGAN:
 
 		for i in range(self.iterations):
 			real_image_batch = self.mnist.train.next_batch(self.batch_size)[0].reshape([self.batch_size, 28, 28, 1])
-			if dLossFake < 0.6:
+			if dLossFake > 0.6:
 				# train discriminator on generated images
 				_, dLossReal, dLossFake, gLoss = sess.run([d_trainer_fake, d_loss_real, d_loss_fake, g_loss], {x_placeholder: real_image_batch})
 
@@ -224,10 +224,10 @@ class DCGAN:
 				d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
 				print('TRAINING STEP', i, 'AT', datetime.datetime.now())
 				for j in range(3):
-					print('Discriminator classification', d_result[i])
-					im = images[j, :, :, 0]
-					plt.imshow(im.reshape([28, 28]), cmap='Greys')
-					plt.show()
+					print('Discriminator classification', d_result[j])
+					# im = images[j, :, :, 0]
+					# plt.imshow(im.reshape([28, 28]), cmap='Greys')
+					# plt.show()
 
 				if i % 5000 == 0:
 					save_path = saver.save(sess, 'models/pretrained_gan.ckpt', global_step=i)
