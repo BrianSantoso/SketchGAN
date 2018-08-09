@@ -38,7 +38,8 @@ class DCGAN:
 		self.mnist = input_data.read_data_sets("MNIST_data/")
 
 		self.batch_size = 50
-		self.iterations = 50000
+		# self.iterations = 50000
+		self.iterations = 0
 		self.z_dimensions = 100
 		self.learning_rate = 0.0001
 
@@ -123,7 +124,7 @@ class DCGAN:
 	def run_session(self):
 
 		sess = tf.Session()
-
+		
 		x_placeholder = tf.placeholder('float', shape=[None, 28, 28, 1], name='x_placeholder')
 		# G(z)
 		Gz = self.generator(self.batch_size, self.z_dimensions)
@@ -179,10 +180,11 @@ class DCGAN:
 
 
 
-		saver = tf.train.Saver()
-
+		self.saver = tf.train.Saver()
+		
 		sess.run(tf.global_variables_initializer())
-
+		self.load(sess, 'models/pretrained_gan.ckpt-45000')
+		
 		gLoss = 0
 		dLossFake, dLossReal = 1, 1
 		d_real_count, d_fake_count, g_count = 0, 0, 0
@@ -230,8 +232,9 @@ class DCGAN:
 					# plt.show()
 
 				if i % 5000 == 0:
-					save_path = saver.save(sess, 'models/pretrained_gan.ckpt', global_step=i)
-					print('Saved to %s' % save_path)
+					# save_path = saver.save(sess, 'models/pretrained_gan.ckpt', global_step=i)
+					# print('Saved to %s' % save_path)
+					self.save(sess, 'models/pretrained_gan.ckpt', i)
 
 		test_images = sess.run(self.generator(10, 100))
 		test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
@@ -244,6 +247,22 @@ class DCGAN:
 			print(test_eval[i])
 			plt.imshow(test_images[i, :, :, 0], cmap='Greys')
 			plt.show()
+
+		# Now do the same for real MNIST images
+		for i in range(10):
+		    print(real_eval[i])
+		    plt.imshow(real_images[i, :, :, 0], cmap='Greys')
+		    plt.show()
+
+	def save(self, sess, dir, iteration):
+		save_path = self.saver.save(sess, dir, global_step=iteration)
+		print('Saved to %s' % save_path)
+		return
+
+	def load(self, sess, prefix):
+		self.saver.restore(sess, prefix)
+		print("Model restored.")
+		return
 
 gan = DCGAN()
 gan.run_session()
