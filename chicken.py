@@ -1,8 +1,12 @@
+# from tensorflow.examples.tutorials.mnist import input_data
+# mnist = input_data.read_data_sets("MNIST_data/")
 # print(mnist.train.next_batch(3)[0].shape) # (3, 784)
+# print(mnist.train.next_batch(3)[0].dtype) # float32
 
 import matplotlib.pyplot as plt
 from PIL import Image
 from random import shuffle
+from math import sqrt, ceil
 import numpy as np
 import os
 
@@ -13,16 +17,22 @@ import os
 # print(pix.shape) # (570, 570, 3)
 
 DEFAULT_INPUT_DIRECTORY = 'test/'
-SUPPORTED_FILE_TYPES = {'jpg'}
+SUPPORTED_FILE_TYPES = {'JPG', 'PNG'}
+UNSUPPORTED_MODES = {'P'}
 
 def get_images(directory=DEFAULT_INPUT_DIRECTORY):
 	# Returns a list of numpy arrays of each image with a supported file type
 	images = []
+	# i=0
 	for file in os.listdir(directory):
 
 		pic = Image.open(directory + file)
+		
+		if pic.mode in UNSUPPORTED_MODES:
+			print(file, 'is of unsupported mode:', pic.mode)
+			continue
 
-		if get_extension(file) in SUPPORTED_FILE_TYPES:
+		if pic.format in SUPPORTED_FILE_TYPES:
 			pix = np.array(pic)
 
 			# if only 1 color channel then triple it
@@ -135,7 +145,7 @@ def grayscale_to_2d(images):
 
 	return np.asarray(data_2d, dtype=np.uint8)
 
-def display_all(images, columns=4, rows=5, figure_size=(8, 8)):
+def display_many(images, columns=4, rows=5, figure_size=(8, 8)):
 
 	fig=plt.figure(figsize=figure_size)
 
@@ -145,13 +155,75 @@ def display_all(images, columns=4, rows=5, figure_size=(8, 8)):
 
 	plt.show()
 
+def display_all(images, figs_per_screen=20):
 
-images = get_images('images/')
-images = images[:20]
+	n = len(images)
+	figs_per_screen = min(n, figs_per_screen)
+
+	for i in range(int(n/figs_per_screen)):
+
+		columns, rows = closest_square_factors(figs_per_screen)
+		display_many(images[i*figs_per_screen : (i+1)*figs_per_screen], columns=columns, rows=rows)
+
+	# leftovers
+	num_leftover = n % figs_per_screen
+	if num_leftover != 0:
+		columns, rows = closest_square_factors(num_leftover)
+		display_many(images[(i+1)*figs_per_screen:], columns=columns, rows=rows)
+
+class DataSet:
+
+	def __init__(self, data):
+		self.data = data
+		self.index = 0
+
+	def next_batch(self, batch_size, reuse=True):
+
+		# if self.index+batch_size <= len(self.data):
+		# 	output = self.data[self.index : self.index+batch_size]
+		# 	self.index += batch_size
+		# 	return output
+		# elif reuse:
+		# 	self.index = 
+		# else:
+		# 	print("Insufficient data left in dataset. Current index:", self.index)
+		# 	return
+
+		output = []
+
+		for i  in range(batch_size):
+
+			output.append(self.data[self.index])
+
+			self.index += 1
+			if self.index >= len(self.data):
+				if reuse:
+					self.index %= len(self.data)
+				else:
+					print("Insufficient data left in dataset. Current index:", self.index)
+					return
+
+
+		return np.array(output)
+		
+
+def closest_square_factors(integer, larger_first=True):
+
+	factors = []
+	root = ceil(sqrt(integer))
+	for i in range(root, integer+1):
+		if integer % i == 0:
+			return (i, int(integer / i)) if  larger_first else (int(integer / i), i)
+
+	return (1, integer)
+
+# images = get_images('test/')
+# images = images[:20]
 # with_flipped = images + fliplr(images)
-gray = grayscale(images, channels=3)
-resized_images = resize_and_smart_crop_square(gray, 256)
-display_all(resized_images)
+# gray = grayscale(images)
+# resized_images = resize_and_smart_crop_square(gray, new_len=256)
+# display_all(resized_images)
+# data_2d = grayscale_to_2d(resized_images)
 
 
 # data_2d = grayscale_to_2d(resized_images)
@@ -159,4 +231,12 @@ display_all(resized_images)
 # print(data_2d[0].shape)
 # gim = np.stack([data_2d[0] for i in range(3)], axis=2)
 # plt.imshow(gim)
-# plt.show()
+# plt.show
+
+images = get_images('test/')
+images = images + fliplr(images)
+images = grayscale(images)
+images = resize_and_smart_crop_square(images, 256)
+display_all(images)
+data2d = grayscale_to_2d(images)
+
