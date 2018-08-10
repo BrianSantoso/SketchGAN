@@ -42,7 +42,7 @@ def get_extension(file_name):
 	extension = file_name[-index:]
 	return extension
 
-def grayscale(images, channels=1):
+def grayscale(images, channels=3):
 
 	grayscale_images = []
 
@@ -114,9 +114,38 @@ def fliplr(images):
 
 	return flipped_images
 
-images = get_images('images/')
-images = images[:10]
-with_flipped = images + fliplr(images)
-gray = grayscale(with_flipped, channels=3)
-resized_images = resize_and_smart_crop_square(gray, 256)
-display(resized_images)
+def flatten(images):
+
+	flattened_images = []
+
+	for image in images:
+		flattened = image.flatten()
+		flattened_images.append(flattened)
+
+	return flattened_images
+
+def grayscale_to_2d(images):
+
+	data_2d = []
+
+	for image in images:
+
+		image_2d = np.mean(image, axis=2)
+		data_2d.append(image_2d)
+
+	return np.asarray(data_2d, dtype=np.uint8)
+
+# images = get_images('test/')
+# images = images[:10]
+# with_flipped = images + fliplr(images)
+# gray = grayscale(with_flipped, channels=3)
+# resized_images = resize_and_smart_crop_square(gray, 256)
+# display(resized_images)
+
+
+# data_2d = grayscale_to_2d(resized_images)
+# print(data_2d[0])
+# print(data_2d[0].shape)
+# gim = np.stack([data_2d[0] for i in range(3)], axis=2)
+# plt.imshow(gim)
+# plt.show()
