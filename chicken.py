@@ -135,12 +135,23 @@ def grayscale_to_2d(images):
 
 	return np.asarray(data_2d, dtype=np.uint8)
 
-# images = get_images('test/')
-# images = images[:10]
+def display_all(images, columns=4, rows=5, figure_size=(8, 8)):
+
+	fig=plt.figure(figsize=figure_size)
+
+	for i in range(1, columns*rows+1):
+			fig.add_subplot(rows, columns, i)
+			plt.imshow(images[i-1])
+
+	plt.show()
+
+
+images = get_images('images/')
+images = images[:20]
 # with_flipped = images + fliplr(images)
-# gray = grayscale(with_flipped, channels=3)
-# resized_images = resize_and_smart_crop_square(gray, 256)
-# display(resized_images)
+gray = grayscale(images, channels=3)
+resized_images = resize_and_smart_crop_square(gray, 256)
+display_all(resized_images)
 
 
 # data_2d = grayscale_to_2d(resized_images)
