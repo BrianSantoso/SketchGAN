@@ -1,16 +1,10 @@
-# from tensorflow.examples.tutorials.mnist import input_data
-
-# mnist = input_data.read_data_sets("MNIST_data/")
-
-# print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
 # print(mnist.train.next_batch(3)[0].shape) # (3, 784)
 
 import matplotlib.pyplot as plt
 from PIL import Image
+from random import shuffle
 import numpy as np
 import os
-
-
 
 # directory = 'images/'
 # pic = Image.open(directory + '0a847fc4663a23248bcc50235342d7e6.jpg')
@@ -32,11 +26,12 @@ def get_images(directory=DEFAULT_INPUT_DIRECTORY):
 			pix = np.array(pic)
 
 			# if only 1 color channel then triple it
-			if len(pix.shape) == 2:
+			if pix.ndim == 2:
 				pix = np.stack([pix, pix, pix], axis=2)
 
-			if len(pix.shape) != 3:
-				print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
+			if pix.ndim != 3:
+				print('Something wrong with', file)
+
 			images.append(pix)
 
 	return images
@@ -52,11 +47,9 @@ def grayscale(images, channels=1):
 	grayscale_images = []
 
 	for image in images:
-
 		gray = np.mean(image, -1)
 		gray = np.array(gray, dtype=np.uint8)
 		grayscale_images.append(np.stack([gray for i in range(channels)], axis=2))
-		# avg = (image[0] + image[1] + image[2]) / 3
 
 	return grayscale_images
 
@@ -67,16 +60,63 @@ def display(*images_args):
 			plt.imshow(image)
 			plt.show()
 
+def resize(images, width, height):
 
-# images = get_images('test/')
-# gray = grayscale(images, channels=3)
-# print(gray)
-# print(gray[0].shape)
-# print(images[0].dtype)
-# display(images)
-# display(gray)
+	resized_images = []
+
+	for pix in images:
+		image = Image.fromarray(pix)
+		image_resized = image.resize((width, height), Image.BILINEAR)
+		new_pix = np.array(image_resized)
+		resized_images.append(new_pix)
+
+	return resized_images
+
+def resize_and_smart_crop_square(images, new_len):
+
+	resized_images = []
+
+	for pix in images:
+
+		image = Image.fromarray(pix)
+		image_width, image_height = image.size
+		scale_factor = 0
+
+		if image_width < image_height:
+			scale_factor = new_len/image_width
+		else:
+			scale_factor = new_len/image_height
+
+		resize_width = int(image_width * scale_factor)
+		resize_height = int(image_height * scale_factor)
+
+		image_resized = image.resize((resize_width, resize_height), Image.BILINEAR)
+
+		left = (resize_width - new_len)/2
+		top = (resize_height - new_len)/2
+		right = (resize_width + new_len)/2
+		bottom = (resize_height + new_len)/2
+
+		image_croppped = image_resized.crop((left, top, right, bottom))
+
+		new_pix = np.array(image_croppped)
+		resized_images.append(new_pix)
+
+	return resized_images
+
+def fliplr(images):
+
+	flipped_images = []
+
+	for image in images:
+		flipped = np.fliplr(image)
+		flipped_images.append(flipped)
+
+	return flipped_images
 
 images = get_images('images/')
 images = images[:10]
-gray = grayscale(images, channels=3)
-display(images, gray)
+with_flipped = images + fliplr(images)
+gray = grayscale(with_flipped, channels=3)
+resized_images = resize_and_smart_crop_square(gray, 256)
+display(resized_images)
