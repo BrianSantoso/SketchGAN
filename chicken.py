@@ -17,7 +17,7 @@ import os
 # print(pix.shape) # (570, 570, 3)
 
 DEFAULT_INPUT_DIRECTORY = 'test/'
-SUPPORTED_FILE_TYPES = {'JPG', 'PNG'}
+SUPPORTED_FILE_TYPES = {'jpg', 'png'}
 UNSUPPORTED_MODES = {'P'}
 
 def get_images(directory=DEFAULT_INPUT_DIRECTORY):
@@ -32,7 +32,7 @@ def get_images(directory=DEFAULT_INPUT_DIRECTORY):
 			print(file, 'is of unsupported mode:', pic.mode)
 			continue
 
-		if pic.format in SUPPORTED_FILE_TYPES:
+		if get_extension(file) in SUPPORTED_FILE_TYPES:
 			pix = np.array(pic)
 
 			# if only 1 color channel then triple it
@@ -82,7 +82,7 @@ def resize(images, width, height):
 
 	return resized_images
 
-def resize_and_smart_crop_square(images, new_len):
+def resize_and_smart_crop_square(images, new_size):
 
 	resized_images = []
 
@@ -93,19 +93,19 @@ def resize_and_smart_crop_square(images, new_len):
 		scale_factor = 0
 
 		if image_width < image_height:
-			scale_factor = new_len/image_width
+			scale_factor = new_size/image_width
 		else:
-			scale_factor = new_len/image_height
+			scale_factor = new_size/image_height
 
 		resize_width = int(image_width * scale_factor)
 		resize_height = int(image_height * scale_factor)
 
 		image_resized = image.resize((resize_width, resize_height), Image.BILINEAR)
 
-		left = (resize_width - new_len)/2
-		top = (resize_height - new_len)/2
-		right = (resize_width + new_len)/2
-		bottom = (resize_height + new_len)/2
+		left = (resize_width - new_size)/2
+		top = (resize_height - new_size)/2
+		right = (resize_width + new_size)/2
+		bottom = (resize_height + new_size)/2
 
 		image_croppped = image_resized.crop((left, top, right, bottom))
 
@@ -179,16 +179,6 @@ class DataSet:
 
 	def next_batch(self, batch_size, reuse=True):
 
-		# if self.index+batch_size <= len(self.data):
-		# 	output = self.data[self.index : self.index+batch_size]
-		# 	self.index += batch_size
-		# 	return output
-		# elif reuse:
-		# 	self.index = 
-		# else:
-		# 	print("Insufficient data left in dataset. Current index:", self.index)
-		# 	return
-
 		output = []
 
 		for i  in range(batch_size):
@@ -203,7 +193,6 @@ class DataSet:
 					print("Insufficient data left in dataset. Current index:", self.index)
 					return
 
-
 		return np.array(output)
 		
 
@@ -217,26 +206,40 @@ def closest_square_factors(integer, larger_first=True):
 
 	return (1, integer)
 
+def save_to_as(images, directory='testoutput/', prefix='img', file_type='jpg'):
+
+	i = 1
+	for pix in images:
+		image = Image.fromarray(pix)
+		image.save(directory + prefix + str(i) + '.' + str.lower(file_type))
+		i += 1
+
+
+
 # images = get_images('test/')
-# images = images[:20]
-# with_flipped = images + fliplr(images)
-# gray = grayscale(images)
-# resized_images = resize_and_smart_crop_square(gray, new_len=256)
-# display_all(resized_images)
-# data_2d = grayscale_to_2d(resized_images)
+# images = images + fliplr(images)
+# images = grayscale(images)
+# images = resize_and_smart_crop_square(images, 256)
+# display_all(images)
+# data2d = grayscale_to_2d(images)
 
+# print('length', len(data2d))
+# dataset = DataSet(data2d)
+# display_all(dataset.next_batch(150))
 
-# data_2d = grayscale_to_2d(resized_images)
-# print(data_2d[0])
-# print(data_2d[0].shape)
-# gim = np.stack([data_2d[0] for i in range(3)], axis=2)
-# plt.imshow(gim)
-# plt.show
-
-images = get_images('test/')
+images = get_images('images/')
 images = images + fliplr(images)
 images = grayscale(images)
 images = resize_and_smart_crop_square(images, 256)
-display_all(images)
-data2d = grayscale_to_2d(images)
+save_to_as(images, directory='data/', prefix='sketch_', file_type='jpg')
+display_all(images, 100)
 
+
+
+data2d = grayscale_to_2d(images)
+print(data2d.shape)
+mean = np.mean(data2d, axis=0)
+mean = np.stack([mean, mean, mean], axis=2)
+mean = np.array(mean, dtype=np.uint8)
+print(mean.shape)
+display([mean])
