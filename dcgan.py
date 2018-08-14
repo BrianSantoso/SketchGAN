@@ -3,7 +3,7 @@ import numpy as np
 import chicken
 import datetime
 import matplotlib.pyplot as plt
-from tensorflow.examples.tutorials.mnist import input_data
+# from tensorflow.examples.tutorials.mnist import input_data
 
 '''
 TODO:
@@ -40,17 +40,22 @@ class DCGAN:
 		
 		self.sketch_dataset = chicken.DataSet(self.load_data())
 
-		self.batch_size = 16
+		
 		self.iterations = 100000
-		# self.iterations = 0
+		self.load_from_ckpt = 57000
+
+		self.batch_size = 16
 		self.z_dimensions = 4096
 		self.learning_rate = 0.0001
 
 	def load_data(self):
+
 		print('Loading Data...')
 		images = chicken.get_images('data/')
 		data2d = chicken.grayscale_to_2d(images)
 		data2d = np.reshape(data2d, (-1, 256, 256, 1))
+		data2d = np.array(data2d, dtype=np.float32)
+		data2d = data2d / 255
 		print('shape:',data2d.shape)
 		# print('sample image:', data2d[0])
 		print('Data Loaded.')
@@ -271,13 +276,15 @@ class DCGAN:
 		self.saver = tf.train.Saver()
 		
 		sess.run(tf.global_variables_initializer())
-		# self.load(sess, 'models/pretrained_gan.ckpt-45000')
+
+		if self.load_from_ckpt:
+			self.load(sess, 'models/pretrained_gan.ckpt-' + str(self.load_from_ckpt))
 		
 		gLoss = 0
 		dLossFake, dLossReal = 1, 1
 		d_real_count, d_fake_count, g_count = 0, 0, 0
 
-		for i in range(self.iterations):
+		for i in range(self.load_from_ckpt, self.iterations):
 			real_image_batch = self.sketch_dataset.next_batch(self.batch_size)
 			if dLossFake > 0.6:
 				# train discriminator on generated images
@@ -315,26 +322,59 @@ class DCGAN:
 				print('TRAINING STEP', i, 'AT', datetime.datetime.now())
 				for j in range(1):
 					print('Discriminator classification', d_result[j])
-					# im = images[j, :, :, 0]
+					# im = 1-images[j, :, :, 0]
 					# plt.imshow(im.reshape([28, 28]), cmap='Greys')
+					# plt.ion()
+					# plt.imshow(im, cmap='Greys')
 					# plt.show()
+					# plt.plot(im)
+					# plt.draw()
+					# plt.show(block=False)
 
-				if i % 5000 == 0:
-					# save_path = saver.save(sess, 'models/pretrained_gan.ckpt', global_step=i)
-					# print('Saved to %s' % save_path)
+			# if i == 15000:
+			# 	images = sess.run(self.generator(3, self.z_dimensions))
+			# 	d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
+			# 	for j in range(3):
+			# 		print('Discriminator classificationnnnnnnnnn', d_result[j])
+			# 		im = 1-images[j, :, :, 0]
+			# 		plt.imshow(im.reshape([28, 28]), cmap='Greys')
+			# 		plt.show()
+
+
+			if i % 1000 == 0:
+				# save_path = saver.save(sess, 'models/pretrained_gan.ckpt', global_step=i)
+				# print('Saved to %s' % save_path)
+				if i != self.load_from_ckpt:
 					self.save(sess, 'models/pretrained_gan.ckpt', i)
 
-		test_images = sess.run(self.generator(10, 4096))
+		test_images = sess.run(self.generator(10, self.z_dimensions))
 		test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
 
 		# real_images = self.mnist.validation.next_batch(10)[0].reshape([10, 28, 28, 1])
 		# real_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: real_images})
 
+		rib = self.sketch_dataset.next_batch(self.batch_size)
+		_, dLossReal, dLossFake, gLoss = sess.run([g_trainer, d_loss_real, d_loss_fake, g_loss], {x_placeholder: rib})
+		print(dLossReal)
+		print(dLossFake)
+		print(gLoss)
+		
 		# display images and show discriminator's probabilities
 		for i in range(10):
-			print(test_eval[i])
-			plt.imshow(test_images[i, :, :, 0], cmap='Greys')
+			# print(test_eval[i])
+			# print(test_images[i])
+			plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
 			plt.show()
+		
+
+		# chicken.display_all(np.reshape(test_images, (-1, 256, 256)))
+		# chicken.display_all(np.reshape(self.sketch_dataset.next_batch(10), (-1, 256, 256)))
+
+		# asdf = self.sketch_dataset.next_batch(10)
+		# for i in range(10):
+		# 	print(asdf[i])
+		# 	plt.imshow(1-asdf[i, :, :, 0], cmap='Greys')
+		# 	plt.show()
 
 		# # Now do the same for real MNIST images
 		# for i in range(10):
