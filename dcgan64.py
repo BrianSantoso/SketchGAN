@@ -41,7 +41,7 @@ class DCGAN:
 		self.sketch_dataset = chicken.DataSet(self.load_data())
 
 		
-		self.iterations = 0
+		self.iterations = 100000
 		self.load_from_ckpt = 0
 
 		self.batch_size = 16
@@ -53,7 +53,7 @@ class DCGAN:
 		print('Loading Data...')
 		images = chicken.get_images('data64/')
 		data2d = chicken.grayscale_to_2d(images)
-		data2d = np.reshape(data2d, (-1, 256, 256, 1))
+		data2d = np.reshape(data2d, (-1, 64, 64, 1))
 		data2d = np.array(data2d, dtype=np.float32)
 		data2d = data2d / 255
 		print('shape:',data2d.shape)
@@ -66,10 +66,11 @@ class DCGAN:
 		if(reuse):
 			tf.get_variable_scope().reuse_variables()
 
+
 		# Convolutional Block 1
-		# 8, 3x3 filters
-		d_w1 = tf.get_variable('d_w1', [3, 3, 1, 8], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		d_b1 = tf.get_variable('d_b1', [8], initializer=tf.constant_initializer(0))
+		# 64, 5x5 filters
+		d_w1 = tf.get_variable('d_w1', [5, 5, 1, 64], initializer=tf.truncated_normal_initializer(stddev=0.02))
+		d_b1 = tf.get_variable('d_b1', [64], initializer=tf.constant_initializer(0))
 		d1 = tf.nn.conv2d(input=x_image, filter=d_w1, strides=[1, 1, 1, 1], padding='SAME')
 		d1 = d1 + d_b1
 		d1 = tf.nn.leaky_relu(d1, alpha=0.2)
@@ -77,9 +78,9 @@ class DCGAN:
 		d1 = tf.nn.avg_pool(d1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 		# Convolutional Block 2
-		# 16, 3x3 filters
-		d_w2 = tf.get_variable('d_w2', [3, 3, 8, 16], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		d_b2 = tf.get_variable('d_b2', [16], initializer=tf.constant_initializer(0))
+		# 128, 5x5 filters
+		d_w2 = tf.get_variable('d_w2', [5, 5, 64, 128], initializer=tf.truncated_normal_initializer(stddev=0.02))
+		d_b2 = tf.get_variable('d_b2', [128], initializer=tf.constant_initializer(0))
 		d2 = tf.nn.conv2d(input=d1, filter=d_w2, strides=[1, 1, 1, 1], padding="SAME")
 		d2 = d2 + d_b2
 		d2 = tf.nn.leaky_relu(d2, alpha=0.2)
@@ -87,9 +88,9 @@ class DCGAN:
 		d2 = tf.nn.avg_pool(d2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME")
 
 		# Convolutional Block 3
-		# 32, 3x3 filters
-		d_w3 = tf.get_variable('d_w3', [3, 3, 16, 32], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		d_b3 = tf.get_variable('d_b3', [32], initializer=tf.constant_initializer(0))
+		# 256, 5x5 filters
+		d_w3 = tf.get_variable('d_w3', [5, 5, 128, 256], initializer=tf.truncated_normal_initializer(stddev=0.02))
+		d_b3 = tf.get_variable('d_b3', [256], initializer=tf.constant_initializer(0))
 		d3 = tf.nn.conv2d(input=d2, filter=d_w3, strides=[1, 1, 1, 1], padding="SAME")
 		d3 = d3 + d_b3
 		d3 = tf.nn.leaky_relu(d3, alpha=0.2)
@@ -98,85 +99,68 @@ class DCGAN:
 
 		# Convolutional Block 4
 		# 64, 3x3 filters
-		d_w4 = tf.get_variable('d_w4', [3, 3, 32, 64], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		d_b4 = tf.get_variable('d_b4', [64], initializer=tf.constant_initializer(0))
+		d_w4 = tf.get_variable('d_w4', [5, 5, 256, 512], initializer=tf.truncated_normal_initializer(stddev=0.02))
+		d_b4 = tf.get_variable('d_b4', [512], initializer=tf.constant_initializer(0))
 		d4 = tf.nn.conv2d(input=d3, filter=d_w4, strides=[1, 1, 1, 1], padding="SAME")
 		d4 = d4 + d_b4
 		d4 = tf.nn.leaky_relu(d4, alpha=0.2)
 		d4 = tf.nn.dropout(d4, keep_prob=0.25)
 		d4 = tf.nn.avg_pool(d4, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME")
 
-		# Convolutional Block 5
-		# 128, 3x3 filters
-		d_w5 = tf.get_variable('d_w5', [3, 3, 64, 128], initializer=tf.truncated_normal_initializer(stddev=0.02))
+		# Fully connected layer 1
+		d_w5 = tf.get_variable('d_w5', [4 * 4 * 512, 128], initializer=tf.truncated_normal_initializer(stddev=0.02))
 		d_b5 = tf.get_variable('d_b5', [128], initializer=tf.constant_initializer(0))
-		d5 = tf.nn.conv2d(input=d4, filter=d_w5, strides=[1, 1, 1, 1], padding="SAME")
+		d5 = tf.reshape(d4, [-1, 4 * 4 * 512])
+		d5 = tf.matmul(d5, d_w5)
 		d5 = d5 + d_b5
 		d5 = tf.nn.leaky_relu(d5, alpha=0.2)
-		d5 = tf.nn.dropout(d5, keep_prob=0.25)
-		d5 = tf.nn.avg_pool(d5, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME")
-
-		# Convolutional Block 6
-		# 256, 3x3 filters
-		d_w6 = tf.get_variable('d_w6', [3, 3, 128, 256], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		d_b6 = tf.get_variable('d_b6', [256], initializer=tf.constant_initializer(0))
-		d6 = tf.nn.conv2d(input=d5, filter=d_w6, strides=[1, 1, 1, 1], padding="SAME")
-		d6 = d6 + d_b6
-		d6 = tf.nn.leaky_relu(d6, alpha=0.2)
-		d6 = tf.nn.dropout(d6, keep_prob=0.25)
-		d6 = tf.nn.avg_pool(d6, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME")
-
-		# Fully connected layer 1
-		d_w7 = tf.get_variable('d_w7', [4 * 4 * 256, 128], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		d_b7 = tf.get_variable('d_b7', [128], initializer=tf.constant_initializer(0))
-		d7 = tf.reshape(d6, [-1, 4 * 4 * 256])
-		d7 = tf.matmul(d7, d_w7)
-		d7 = d7 + d_b7
-		d7 = tf.nn.leaky_relu(d7)
 
 		# Fully connected layer 2
-		d_w8 = tf.get_variable('d_w8', [128, 1], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		d_b8 = tf.get_variable('d_b8', [1], initializer=tf.constant_initializer(0))
-		d8 = tf.matmul(d7, d_w8)
-		d8 = d8 + d_b8
+		d_w6 = tf.get_variable('d_w6', [128, 1], initializer=tf.truncated_normal_initializer(stddev=0.02))
+		d_b6 = tf.get_variable('d_b6', [1], initializer=tf.constant_initializer(0))
+		d6 = tf.matmul(d5, d_w6)
+		d6 = d6 + d_b6
 
 		# dimensions of output tensor: batchsize x 1
 		# (binary classification)
-		return d8
+		return d6
+
 
 	def generator(self, batch_size, z_dim):
 		z = tf.truncated_normal([batch_size, z_dim], mean=0, stddev=1, name='z')
 
 		g_w1 = tf.get_variable('g_w1', [z_dim, 4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b1 = tf.get_variable('g_b1', [4*4*1024], initializer=tf.constant_initializer(0))
-		# g1 = tf.matmul(z, g_w1) + g_b1
+		g1 = tf.matmul(z, g_w1) + g_b1
 		g1 = tf.reshape(g1, [-1, 4, 4, 1024])
 		g1 = tf.contrib.layers.batch_norm(g1, epsilon=1e-5, scope='bn1')
 		g1 = tf.nn.relu(g1)
 
-		g_w2 = tf.get_variable('g_w2', [5, 5, 1024, 512], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
+		g_w2 = tf.get_variable('g_w2', [5, 5, 512, 1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b2 = tf.get_variable('g_b2', [512], dtype=tf.float32, initializer=tf.constant_initializer(0))
+		# print(g1.get_shape())
+		# print(g_w2.get_shape())
 		g2 = tf.nn.conv2d_transpose(g1, g_w2, output_shape=[batch_size, 8, 8, 512], strides=[1, 2, 2, 1])
 		# g2 = g2 + g_b2 #tf.nn.bias_add?
 		g2 = tf.reshape(tf.nn.bias_add(g2, g_b2), g2.get_shape())
 		g2 = tf.contrib.layers.batch_norm(g2, epsilon=1e-5, scope='bn2')
 		g2 = tf.nn.relu(g2)
 
-		g_w3 = tf.get_variable('g_w3', [5, 5, 512, 256], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
+		g_w3 = tf.get_variable('g_w3', [5, 5, 256, 512], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b3 = tf.get_variable('g_b3', [256], dtype=tf.float32, initializer=tf.constant_initializer(0))
 		g3 = tf.nn.conv2d_transpose(g2, g_w3, output_shape=[batch_size, 16, 16, 256], strides=[1, 2, 2, 1])
 		g3 = tf.reshape(tf.nn.bias_add(g3, g_b3), g3.get_shape())
 		g3 = tf.contrib.layers.batch_norm(g3, epsilon=1e-5, scope='bn3')
 		g3 = tf.nn.relu(g3)
 
-		g_w4 = tf.get_variable('g_w4', [5, 5, 256, 128], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
+		g_w4 = tf.get_variable('g_w4', [5, 5, 128, 256], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b4 = tf.get_variable('g_b4', [128], dtype=tf.float32, initializer=tf.constant_initializer(0))
 		g4 = tf.nn.conv2d_transpose(g3, g_w4, output_shape=[batch_size, 32, 32, 128], strides=[1, 2, 2, 1])
 		g4 = tf.reshape(tf.nn.bias_add(g4, g_b4), g4.get_shape())
 		g4 = tf.contrib.layers.batch_norm(g4, epsilon=1e-5, scope='bn4')
 		g4 = tf.nn.relu(g4)
 
-		g_w5 = tf.get_variable('g_w5', [5, 5, 128, 1], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
+		g_w5 = tf.get_variable('g_w5', [5, 5, 1, 128], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b5 = tf.get_variable('g_b5', [1], dtype=tf.float32, initializer=tf.constant_initializer(0))
 		g5 = tf.nn.conv2d_transpose(g4, g_w5, output_shape=[batch_size, 64, 64, 1], strides=[1, 2, 2, 1])
 		g5 = tf.reshape(tf.nn.bias_add(g5, g_b5), g5.get_shape())
@@ -187,71 +171,12 @@ class DCGAN:
 
 		return g5
 
-		# # filter syntax: [filter_height, filter_width, in_channels, out_channels]
-		# g_w2 = tf.get_variable('g_w2', [3, 3, 256, 256], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g_b2 = tf.get_variable('g_b2', [256], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g2 = tf.nn.conv2d(g1, g_w2, strides=[1, 2, 2, 1], padding='SAME')
-		# g2 = g2 + g_b2
-		# g2 = tf.contrib.layers.batch_norm(g2, epsilon=1e-5, scope='bn2')
-		# g2 = tf.nn.relu(g2)
-		# g2 = tf.image.resize_images(g2, [8, 8])
-
-		# g_w3 = tf.get_variable('g_w3', [3, 3, 256, 128], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g_b3 = tf.get_variable('g_b3', [128], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g3 = tf.nn.conv2d(g2, g_w3, strides=[1, 2, 2, 1], padding='SAME')
-		# g3 = g3 + g_b3
-		# g3 = tf.contrib.layers.batch_norm(g3, epsilon=1e-5, scope='bn3')
-		# g3 = tf.nn.relu(g3)
-		# g3 = tf.image.resize_images(g3, [16, 16])
-
-		# g_w4 = tf.get_variable('g_w4', [3, 3, 128, 64], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g_b4 = tf.get_variable('g_b4', [64], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g4 = tf.nn.conv2d(g3, g_w4, strides=[1, 2, 2, 1], padding='SAME')
-		# g4 = g4 + g_b4
-		# g4 = tf.contrib.layers.batch_norm(g4, epsilon=1e-5, scope='bn4')
-		# g4 = tf.nn.relu(g4)
-		# g4 = tf.image.resize_images(g4, [32, 32])
-
-		# g_w5 = tf.get_variable('g_w5', [3, 3, 64, 32], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g_b5 = tf.get_variable('g_b5', [32], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g5 = tf.nn.conv2d(g4, g_w5, strides=[1, 2, 2, 1], padding='SAME')
-		# g5 = g5 + g_b5
-		# g5 = tf.contrib.layers.batch_norm(g5, epsilon=1e-5, scope='bn5')
-		# g5 = tf.nn.relu(g5)
-		# g5 = tf.image.resize_images(g5, [64, 64])
-
-		# g_w6 = tf.get_variable('g_w6', [3, 3, 32, 16], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g_b6 = tf.get_variable('g_b6', [16], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g6 = tf.nn.conv2d(g5, g_w6, strides=[1, 2, 2, 1], padding='SAME')
-		# g6 = g6 + g_b6
-		# g6 = tf.contrib.layers.batch_norm(g6, epsilon=1e-5, scope='bn6')
-		# g6 = tf.nn.relu(g6)
-		# g6 = tf.image.resize_images(g6, [128, 128])
-
-		# g_w7 = tf.get_variable('g_w7', [3, 3, 16, 8], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g_b7 = tf.get_variable('g_b7', [8], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g7 = tf.nn.conv2d(g6, g_w7, strides=[1, 2, 2, 1], padding='SAME')
-		# g7 = g7 + g_b7
-		# g7 = tf.contrib.layers.batch_norm(g7, epsilon=1e-5, scope='bn7')
-		# g7 = tf.nn.relu(g7)
-		# g7 = tf.image.resize_images(g7, [256, 256])
-
-		# g_w8 = tf.get_variable('g_w8', [3, 3, 8, 1], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g_b8 = tf.get_variable('g_b8', [1], initializer=tf.truncated_normal_initializer(stddev=0.02))
-		# g8 = tf.nn.conv2d(g7, g_w8, strides=[1, 1, 1, 1], padding='SAME')
-		# # g8 = tf.nn.conv2d(g7, g_w8, strides=[1, 2, 2, 1], padding='SAME')
-		# g8 = g8 + g_b8
-		# g8 = tf.sigmoid(g8) # no batch norm, but sigmoid for crisper images
-
-		# # dimensions of output tensor: batch_size x 256 x 256 x 1
-		# # changed from 3 to 1 channels
-		# return g8
 
 	def run_session(self):
 
 		sess = tf.Session()
 		
-		x_placeholder = tf.placeholder('float', shape=[None, 256, 256, 1], name='x_placeholder')
+		x_placeholder = tf.placeholder('float', shape=[None, 64, 64, 1], name='x_placeholder')
 		# G(z)
 		Gz = self.generator(self.batch_size, self.z_dimensions)
 		# D(x)
@@ -364,14 +289,14 @@ class DCGAN:
 					# plt.draw()
 					# plt.show(block=False)
 
-			# if i == 15000:
-			# 	images = sess.run(self.generator(3, self.z_dimensions))
-			# 	d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
-			# 	for j in range(3):
-			# 		print('Discriminator classificationnnnnnnnnn', d_result[j])
-			# 		im = 1-images[j, :, :, 0]
-			# 		plt.imshow(im.reshape([28, 28]), cmap='Greys')
-			# 		plt.show()
+			if i == 15000 or i == 5000:
+				images = sess.run(self.generator(3, self.z_dimensions))
+				d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
+				for j in range(3):
+					print('Discriminator classificationnnnnnnnnn', d_result[j])
+					im = 1-images[j, :, :, 0]
+					plt.imshow(im.reshape([28, 28]), cmap='Greys')
+					plt.show()
 
 
 			if i % 1000 == 0:
