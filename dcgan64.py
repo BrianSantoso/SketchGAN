@@ -30,6 +30,11 @@ Helpul Links:
 	https://datascience.stackexchange.com/questions/9302/the-cross-entropy-error-function-in-neural-networks
 
 	https://www.tensorflow.org/api_docs/python/tf/reshape
+
+	https://github.com/carpedm20/DCGAN-tensorflow/blob/master/model.py
+	https://github.com/carpedm20/DCGAN-tensorflow/blob/master/ops.py
+	https://www.tensorflow.org/api_docs/python/tf/nn/conv2d_transpose
+
 '''
 
 class DCGAN:
@@ -41,8 +46,8 @@ class DCGAN:
 		self.sketch_dataset = chicken.DataSet(self.load_data())
 
 		
-		self.iterations = 100000
-		self.load_from_ckpt = 0
+		self.iterations = 50000 
+		self.load_from_ckpt = 50000
 
 		self.batch_size = 16
 		self.z_dimensions = 100
@@ -141,29 +146,32 @@ class DCGAN:
 		# print(g1.get_shape())
 		# print(g_w2.get_shape())
 		g2 = tf.nn.conv2d_transpose(g1, g_w2, output_shape=[batch_size, 8, 8, 512], strides=[1, 2, 2, 1])
-		# g2 = g2 + g_b2 #tf.nn.bias_add?
-		g2 = tf.reshape(tf.nn.bias_add(g2, g_b2), g2.get_shape())
+		g2 = g2 + g_b2 #tf.nn.bias_add?
+		# g2 = tf.reshape(tf.nn.bias_add(g2, g_b2), g2.get_shape())
 		g2 = tf.contrib.layers.batch_norm(g2, epsilon=1e-5, scope='bn2')
 		g2 = tf.nn.relu(g2)
 
 		g_w3 = tf.get_variable('g_w3', [5, 5, 256, 512], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b3 = tf.get_variable('g_b3', [256], dtype=tf.float32, initializer=tf.constant_initializer(0))
 		g3 = tf.nn.conv2d_transpose(g2, g_w3, output_shape=[batch_size, 16, 16, 256], strides=[1, 2, 2, 1])
-		g3 = tf.reshape(tf.nn.bias_add(g3, g_b3), g3.get_shape())
+		g3 = g3 + g_b3
+		# g3 = tf.reshape(tf.nn.bias_add(g3, g_b3), g3.get_shape())
 		g3 = tf.contrib.layers.batch_norm(g3, epsilon=1e-5, scope='bn3')
 		g3 = tf.nn.relu(g3)
 
 		g_w4 = tf.get_variable('g_w4', [5, 5, 128, 256], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b4 = tf.get_variable('g_b4', [128], dtype=tf.float32, initializer=tf.constant_initializer(0))
 		g4 = tf.nn.conv2d_transpose(g3, g_w4, output_shape=[batch_size, 32, 32, 128], strides=[1, 2, 2, 1])
-		g4 = tf.reshape(tf.nn.bias_add(g4, g_b4), g4.get_shape())
+		g4 = g4 + g_b4
+		# g4 = tf.reshape(tf.nn.bias_add(g4, g_b4), g4.get_shape())
 		g4 = tf.contrib.layers.batch_norm(g4, epsilon=1e-5, scope='bn4')
 		g4 = tf.nn.relu(g4)
 
 		g_w5 = tf.get_variable('g_w5', [5, 5, 1, 128], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b5 = tf.get_variable('g_b5', [1], dtype=tf.float32, initializer=tf.constant_initializer(0))
 		g5 = tf.nn.conv2d_transpose(g4, g_w5, output_shape=[batch_size, 64, 64, 1], strides=[1, 2, 2, 1])
-		g5 = tf.reshape(tf.nn.bias_add(g5, g_b5), g5.get_shape())
+		g5 = g5 + g_b5
+		# g5 = tf.reshape(tf.nn.bias_add(g5, g_b5), g5.get_shape())
 		# no batch norm
 		# g5 = tf.contrib.layers.batch_norm(g5, epsilon=1e-5, scope='bn5')
 		alpha = 0.2
@@ -196,7 +204,6 @@ class DCGAN:
 		tvars = tf.trainable_variables()
 		d_vars = [var for var in tvars if 'd_' in var.name]
 		g_vars = [var for var in tvars if 'g_' in var.name]
-
 
 		with tf.variable_scope(scope):
 			d_trainer_fake = tf.train.AdamOptimizer(self.learning_rate).minimize(d_loss_fake, var_list=d_vars)
@@ -231,7 +238,7 @@ class DCGAN:
 
 
 
-		self.saver = tf.train.Saver()
+		self.saver = tf.train.Saver(max_to_keep=1000)
 		
 		sess.run(tf.global_variables_initializer())
 
@@ -274,7 +281,7 @@ class DCGAN:
 				# writer.add_summary(summary, i)
 				# d_real_count, d_fake_count, g_count = 0, 0, 0
 
-			if i % 1000 == 0:
+			if i % 500 == 0:
 				images = sess.run(self.generator(3, self.z_dimensions))
 				d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
 				print('TRAINING STEP', i, 'AT', datetime.datetime.now())
@@ -289,17 +296,17 @@ class DCGAN:
 					# plt.draw()
 					# plt.show(block=False)
 
-			if i == 15000 or i == 5000:
-				images = sess.run(self.generator(3, self.z_dimensions))
-				d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
-				for j in range(3):
-					print('Discriminator classificationnnnnnnnnn', d_result[j])
-					im = 1-images[j, :, :, 0]
-					plt.imshow(im.reshape([28, 28]), cmap='Greys')
-					plt.show()
+			# if i == 15000 or i == 5000:
+			# 	images = sess.run(self.generator(3, self.z_dimensions))
+			# 	d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
+			# 	for j in range(3):
+			# 		print('Discriminator classificationnnnnnnnnn', d_result[j])
+			# 		im = 1-images[j, :, :, 0]
+			# 		plt.imshow(im.reshape([64, 64]), cmap='Greys')
+			# 		plt.show()
 
 
-			if i % 1000 == 0:
+			if i % 500 == 0:
 				# save_path = saver.save(sess, 'models/pretrained_gan.ckpt', global_step=i)
 				# print('Saved to %s' % save_path)
 				if i != self.load_from_ckpt:
