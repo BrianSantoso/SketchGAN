@@ -2,6 +2,8 @@
 # mnist = input_data.read_data_sets("MNIST_data/")
 # print(mnist.train.next_batch(3)[0].shape) # (3, 784)
 # print(mnist.train.next_batch(3)[0].dtype) # float32
+# print(mnist.train.next_batch(3)[0]) # background color is 0.
+# print(max(mnist.train.next_batch(3)[0][0])) # max color is 1.0
 
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -227,19 +229,66 @@ def save_to_as(images, directory='testoutput/', prefix='img', file_type='jpg'):
 # dataset = DataSet(data2d)
 # display_all(dataset.next_batch(150))
 
-images = get_images('images/')
-images = images + fliplr(images)
-images = grayscale(images)
-images = resize_and_smart_crop_square(images, 256)
-save_to_as(images, directory='data/', prefix='sketch_', file_type='jpg')
-display_all(images, 100)
+# images = get_images('images/')
+# images = images + fliplr(images)
+# images = grayscale(images)
+# images = resize_and_smart_crop_square(images, 256)
+# save_to_as(images, directory='data/', prefix='sketch_', file_type='jpg')
+# display_all(images, 100)
+
+# images = get_images('data/')
+# data2d = grayscale_to_2d(images)
+
+# print(data2d.shape)
+# mean = np.mean(data2d, axis=0)
+# mean = np.stack([mean, mean, mean], axis=2)
+# mean = np.array(mean, dtype=np.uint8)
+# print(mean.shape)
+# display([mean])
+
+# images = get_images('data/')
+# data2d = grayscale_to_2d(images)
+# data2d = np.reshape(data2d, (-1, 256, 256, 1))
+# data2d = np.array(data2d, dtype=np.float32)
+# data2d = data2d / 255
+
+# im = data2d[0, :, :, 0]
+# plt.imshow(1-im, cmap='Greys')
+# plt.show()
+# print(im)
 
 
 
-data2d = grayscale_to_2d(images)
-print(data2d.shape)
-mean = np.mean(data2d, axis=0)
-mean = np.stack([mean, mean, mean], axis=2)
-mean = np.array(mean, dtype=np.uint8)
-print(mean.shape)
-display([mean])
+
+
+# images = get_images('images/')
+# images = images[:3]
+# images = images + fliplr(images)
+# images = grayscale(images)
+# images = resize_and_smart_crop_square(images, 128)
+# display(images)
+
+# images = get_images('images/')
+# images = images[:100]
+# images = grayscale(images)
+# images = resize_and_smart_crop_square(images, 64)
+# display_all(images)
+
+
+# # images 64 preprocessing
+# images64 = get_images('images/')
+# images64 = images64 + fliplr(images64)
+# images64 = grayscale(images64)
+# images64 = resize_and_smart_crop_square(images64, 64)
+# # display_all(images64)
+
+# data2d_64 = grayscale_to_2d(images64)
+# data2d_64 = np.reshape(data2d_64, (-1, 64, 64, 1))
+# data2d_64 = np.array(data2d_64, dtype=np.float32)
+# data2d_64 = data2d_64 / 255
+
+# print(data2d_64.shape)
+
+# print('Saving...')
+# save_to_as(images64, directory='data64/', prefix='sketch64_', file_type='jpg')
+# print('Saved.')
