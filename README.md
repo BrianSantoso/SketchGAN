@@ -8,8 +8,8 @@ The training set consists of 1001 unique grayscale images of pencil sketches of 
 
 
 Samples from 100k iterations:
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_1.PNG" width="614">
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_2.PNG" width="614">
+
+
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_3.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_4.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_5.PNG" width="614">
