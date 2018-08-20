@@ -35,6 +35,8 @@ Helpul Links:
 	https://github.com/carpedm20/DCGAN-tensorflow/blob/master/ops.py
 	https://www.tensorflow.org/api_docs/python/tf/nn/conv2d_transpose
 
+	Checkerboard artifacts -> https://distill.pub/2016/deconv-checkerboard/
+
 '''
 
 class DCGAN:
@@ -46,8 +48,8 @@ class DCGAN:
 		self.sketch_dataset = chicken.DataSet(self.load_data())
 
 		
-		self.iterations = 100000 
-		self.load_from_ckpt = 65000
+		self.iterations = 100000
+		self.load_from_ckpt = 100000
 
 		self.batch_size = 16
 		self.z_dimensions = 100
