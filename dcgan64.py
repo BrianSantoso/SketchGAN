@@ -46,8 +46,8 @@ class DCGAN:
 		self.sketch_dataset = chicken.DataSet(self.load_data())
 
 		
-		self.iterations = 50000 
-		self.load_from_ckpt = 50000
+		self.iterations = 100000 
+		self.load_from_ckpt = 65000
 
 		self.batch_size = 16
 		self.z_dimensions = 100
@@ -324,16 +324,19 @@ class DCGAN:
 		print(gLoss)
 
 
-		test_images = sess.run(self.generator(15, self.z_dimensions))
+		test_images = sess.run(self.generator(20, self.z_dimensions))
 		test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
 		
 		# display images and show discriminator's probabilities
-		for i in range(15):
-			print(test_eval[i])
-			# print(test_images[i])
-			plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
-			plt.show()
+		# for i in range(15):
+		# 	print(test_eval[i])
+		# 	# print(test_images[i])
+		# 	plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
+		# 	plt.show()
 		
+		test_images = chicken.squeeze(test_images)
+		test_images = chicken.data2d_to_grayscale(test_images)
+		chicken.display_all(test_images)
 
 		# chicken.display_all(np.reshape(test_images, (-1, 256, 256)))
 		# chicken.display_all(np.reshape(self.sketch_dataset.next_batch(10), (-1, 256, 256)))

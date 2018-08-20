@@ -173,6 +173,30 @@ def display_all(images, figs_per_screen=20):
 		columns, rows = closest_square_factors(num_leftover)
 		display_many(images[(i+1)*figs_per_screen:], columns=columns, rows=rows)
 
+def data2d_to_grayscale(data2d):
+
+	grayscale_images = []
+
+	for pix in data2d:
+
+		grayscale = np.stack([pix, pix, pix], axis=2)
+		grayscale_images.append(grayscale)
+
+	return np.array(grayscale_images)
+
+def squeeze(images):
+
+	squeezed = []
+
+	for pix in images:
+
+		reshaped = np.squeeze(pix, axis=2)
+		squeezed.append(reshaped)
+
+	return np.array(squeezed)
+
+
+
 class DataSet:
 
 	def __init__(self, data):
