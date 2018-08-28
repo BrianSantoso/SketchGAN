@@ -19,7 +19,7 @@ The training set consists of 1001 unique grayscale images of pencil sketches of 
 
 
 
-Generated sketches after 299.5k training iterations
+Generated sketches after 299.5k training iterations:
 
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_1.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_2.PNG" width="614">
