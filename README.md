@@ -1,8 +1,12 @@
 # SketchGAN
 Deep Convolutional Generative Adversarial Network (DCGAN) for generating pencil sketches
 
+Generated sketches after 363k training iterations
 
-Generated Sketches after 299.5k training iterations
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_1.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_2.PNG" width="614">
+
+Generated sketches after 299.5k training iterations
 
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_1.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_2.PNG" width="614">
