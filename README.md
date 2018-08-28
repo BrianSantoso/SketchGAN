@@ -1,10 +1,9 @@
 # SketchGAN
 Deep Convolutional Generative Adversarial Network (DCGAN) for generating pencil sketches
 
-
-Generated sketches after 363k training iterations
-
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_7.PNG" width="614">
+(generated sketches after 363k training iterations)
+
 The model contains a total of 24,216,196 trainable parameters.
 
 The final layer of the generator network utilizes a sigmoid function that is stretched by a factor of 5 (by scaling the input by 0.2). This allows for smooth pencil-like textures (as opposed to crisp, pen-like figures like the digits from the MNIST dataset).
