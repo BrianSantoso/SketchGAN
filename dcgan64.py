@@ -48,8 +48,8 @@ class DCGAN:
 		self.sketch_dataset = chicken.DataSet(self.load_data())
 
 		
-		self.iterations = 100000
-		self.load_from_ckpt = 100000
+		self.iterations = 499500
+		self.load_from_ckpt = 499500
 
 		self.batch_size = 16
 		self.z_dimensions = 100
@@ -240,12 +240,12 @@ class DCGAN:
 
 
 
-		self.saver = tf.train.Saver(max_to_keep=1000)
+		self.saver = tf.train.Saver(max_to_keep=3)
 		
 		sess.run(tf.global_variables_initializer())
 
 		if self.load_from_ckpt:
-			self.load(sess, 'models/pretrained_gan.ckpt-' + str(self.load_from_ckpt))
+			self.load(sess, 'models64/pretrained_gan.ckpt-' + str(self.load_from_ckpt))
 		
 		gLoss = 0
 		dLossFake, dLossReal = 1, 1
@@ -312,7 +312,7 @@ class DCGAN:
 				# save_path = saver.save(sess, 'models/pretrained_gan.ckpt', global_step=i)
 				# print('Saved to %s' % save_path)
 				if i != self.load_from_ckpt:
-					self.save(sess, 'models/pretrained_gan.ckpt', i)
+					self.save(sess, 'models64/pretrained_gan.ckpt', i)
 
 		
 
@@ -326,11 +326,11 @@ class DCGAN:
 		print(gLoss)
 
 
-		test_images = sess.run(self.generator(20, self.z_dimensions))
+		test_images = sess.run(self.generator(100, self.z_dimensions))
 		test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
 		
-		# display images and show discriminator's probabilities
-		# for i in range(15):
+		# # display images and show discriminator's probabilities
+		# for i in range(20):
 		# 	print(test_eval[i])
 		# 	# print(test_images[i])
 		# 	plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
@@ -338,8 +338,10 @@ class DCGAN:
 		
 		test_images = chicken.squeeze(test_images)
 		test_images = chicken.data2d_to_grayscale(test_images)
-		chicken.display_all(test_images)
+		chicken.display_all(test_images, 20)
 
+		total_parameters = self.get_total_parameters()
+		print("total_parameters: ", total_parameters)
 		# chicken.display_all(np.reshape(test_images, (-1, 256, 256)))
 		# chicken.display_all(np.reshape(self.sketch_dataset.next_batch(10), (-1, 256, 256)))
 
@@ -364,6 +366,19 @@ class DCGAN:
 		self.saver.restore(sess, prefix)
 		print("Model restored.")
 		return
+
+	def get_total_parameters(self):
+		total_parameters = 0
+		#iterating over all variables
+		for variable in tf.trainable_variables():  
+			local_parameters = 1
+			#getting shape of a variable
+			shape = variable.get_shape()
+			for i in shape:
+				#mutiplying dimension values
+				local_parameters *= i.value
+			total_parameters+=local_parameters
+		return total_parameters
 
 gan = DCGAN()
 gan.run_session()
