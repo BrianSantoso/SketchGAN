@@ -7,19 +7,6 @@ from random import randint
 # from tensorflow.examples.tutorials.mnist import input_data
 
 '''
-TODO:
-	- Implement ezgan and test on MNIST datset
-	- Double Check with https://github.com/jonbruner/ezgan
-	- Implement batch normalization
-	- Modify network architecture + hyperparameters to match GAN256
-	or other architectures proven to work
-	- Train on sketch images
-
-Things to understand:
-	- reeuse of tf variables
-	- why gen has batch size and batch norm while discrim doesn't
-	- why d_loss_real is calculated with 0.9 instead of 1
-
 Helpul Links:
 	https://github.com/llSourcell/Generative_Adversarial_networks_LIVE/blob/master/EZGAN.ipynb
 	-> (fto ix cell 4 in jupyter notebook) https://github.com/llSourcell/Generative_Adversarial_networks_LIVE/issues/2
@@ -462,36 +449,43 @@ class DCGAN:
 		return
 
 	def test_interpolation_sequence_1(self, sess):
-		a = self.latent_space_traversal(sess, 934732, 234534678678, segments=20, inclusivity=(False, True))
+		a = self.latent_space_traversal(sess, 934732, 234534678678, segments=60, inclusivity=(False, True))
 		a0 = self.latent_space_traversal(sess, 234534678678, 234534678678, segments=20, inclusivity=(False, True))
 
-		b = self.latent_space_traversal(sess, 234534678678, 56434523445, segments=20, inclusivity=(False, True))
+		b = self.latent_space_traversal(sess, 234534678678, 56434523445, segments=60, inclusivity=(False, True))
 		b0 = self.latent_space_traversal(sess, 56434523445, 56434523445, segments=20, inclusivity=(False, True))
 
-		c = self.latent_space_traversal(sess, 56434523445, 6972514296, segments=20, inclusivity=(False, True))
+		c = self.latent_space_traversal(sess, 56434523445, 6972514296, segments=60, inclusivity=(False, True))
 		c0 = self.latent_space_traversal(sess, 6972514296, 6972514296, segments=20, inclusivity=(False, True))
 
-		d = self.latent_space_traversal(sess, 6972514296, 8027089512, segments=20, inclusivity=(False, True))
+		d = self.latent_space_traversal(sess, 6972514296, 8027089512, segments=60, inclusivity=(False, True))
 		d0 = self.latent_space_traversal(sess, 8027089512, 8027089512, segments=20, inclusivity=(False, True))
 
-		e = self.latent_space_traversal(sess, 8027089512, 383, segments=20, inclusivity=(False, True))
+		e = self.latent_space_traversal(sess, 8027089512, 383, segments=60, inclusivity=(False, True))
 		e0 = self.latent_space_traversal(sess, 383, 383, segments=20, inclusivity=(False, True))
 
-		f = self.latent_space_traversal(sess, 383, 19040, segments=20, inclusivity=(False, True))
+		f = self.latent_space_traversal(sess, 383, 19040, segments=60, inclusivity=(False, True))
 		f0 = self.latent_space_traversal(sess, 19040, 19040, segments=20, inclusivity=(False, True))
 
-		g = self.latent_space_traversal(sess, 19040, 94889, segments=20, inclusivity=(False, True))
+		g = self.latent_space_traversal(sess, 19040, 94889, segments=60, inclusivity=(False, True))
 		g0 = self.latent_space_traversal(sess, 94889, 94889, segments=20, inclusivity=(False, True))
 
-		h = self.latent_space_traversal(sess, 94889, 89018, segments=20, inclusivity=(False, True))
+		h = self.latent_space_traversal(sess, 94889, 89018, segments=60, inclusivity=(False, True))
 		h0 = self.latent_space_traversal(sess, 89018, 89018, segments=20, inclusivity=(False, True))
 
-		i = self.latent_space_traversal(sess, 89018, 934732, segments=20, inclusivity=(False, True))
+		i = self.latent_space_traversal(sess, 89018, 934732, segments=60, inclusivity=(False, True))
 		i0 = self.latent_space_traversal(sess, 934732, 934732, segments=20, inclusivity=(False, True))
 
-		image_sequence = np.concatenate([a, a0, b, b0, c, c0, d, d0, e, e0, f, f0, g, g0, h, h0, i, i0])
+		# image_sequence = np.concatenate([a, a0, b, b0, c, c0, d, d0, e, e0, f, f0, g, g0, h, h0, i, i0])
+		image_sequence = np.concatenate([a, b, c, d, e, f, g, h, i])
 
-		self.save_as_gif(image_sequence, duration=1/30, loops=0, output_directory="testoutput/", filename="latent_space_traversal_3")
+		image_sequence = chicken.squeeze(image_sequence)
+		image_sequence = chicken.data2d_to_grayscale(image_sequence)
+		image_sequence = image_sequence * 255
+		image_sequence = np.array(image_sequence, dtype=np.uint8)
+
+		# chicken.save_to_as(image_sequence, directory='testoutput2/test5/', prefix='imgif', file_type='jpg')
+		# self.save_as_gif(image_sequence, duration=1/30, loops=0, output_directory="testoutput/", filename="latent_space_traversal_3")
 
 
 gan = DCGAN()
