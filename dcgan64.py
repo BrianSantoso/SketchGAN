@@ -360,19 +360,7 @@ class DCGAN:
 		# for i in range(10):
 		# 	self.latent_space_traversal(sess, segments=19, inclusivity=(True, True))
 
-		a = self.latent_space_traversal(sess, 934732, 234534678678, segments=20, inclusivity=(False, True))
-		b = self.latent_space_traversal(sess, 234534678678, 56434523445, segments=20, inclusivity=(False, True))
-		c = self.latent_space_traversal(sess, 56434523445, 6972514296, segments=20, inclusivity=(False, True))
-		d = self.latent_space_traversal(sess, 6972514296, 8027089512, segments=20, inclusivity=(False, True))
-		e = self.latent_space_traversal(sess, 8027089512, 383, segments=20, inclusivity=(False, True))
-		f = self.latent_space_traversal(sess, 383, 19040, segments=20, inclusivity=(False, True))
-		g = self.latent_space_traversal(sess, 19040, 94889, segments=20, inclusivity=(False, True))
-		h = self.latent_space_traversal(sess, 94889, 89018, segments=20, inclusivity=(False, True))
-		i = self.latent_space_traversal(sess, 89018, 934732, segments=20, inclusivity=(False, True))
-
-		image_sequence = np.concatenate([a, b, c, d, e, f, g, h, i])
-
-		self.save_as_gif(image_sequence, duration=1/30, loops=0, output_directory="testoutput/", filename="latent_space_traversal_1")
+		self.test_interpolation_sequence_1(sess)
 
 
 		# z3 = self.noise(self.z_dimensions, seed=2345656)
@@ -434,7 +422,7 @@ class DCGAN:
 
 		return np.array(vectors)
 
-	def latent_space_traversal(self, sess, seed1=None, seed2=None, segments=20, inclusivity=(True, True)):
+	def latent_space_traversal(self, sess, seed1=None, seed2=None, segments=20, inclusivity=(True, True), display=False):
 
 		seed1 = seed1 if seed1 is not None else randint(0, 1000000)
 		z1 = self.noise(self.z_dimensions, seed=seed1)
@@ -445,8 +433,10 @@ class DCGAN:
 		test_image2 = sess.run(self.generator(1, self.z_dimensions, z2))
 
 		interpolation = self.interpolate(test_image1[0], test_image2[0], segments=segments, inclusivity=inclusivity)
-		self.display_all(interpolation, 20)
-		print(seed1, seed2)
+		
+		if display:
+			self.display_all(interpolation, 20)
+			print(seed1, seed2)
 		return interpolation
 
 	def noise(self, z_dim, mean=0, stddev=1,seed=None, amount=1):
@@ -469,8 +459,39 @@ class DCGAN:
 		images = images * 255
 		images = np.array(images, dtype=np.uint8)
 		chicken.save_as_gif(images=images, duration=duration, loops=loops, output_directory=output_directory, filename=filename)
+		return
 
+	def test_interpolation_sequence_1(self, sess):
+		a = self.latent_space_traversal(sess, 934732, 234534678678, segments=20, inclusivity=(False, True))
+		a0 = self.latent_space_traversal(sess, 234534678678, 234534678678, segments=20, inclusivity=(False, True))
 
+		b = self.latent_space_traversal(sess, 234534678678, 56434523445, segments=20, inclusivity=(False, True))
+		b0 = self.latent_space_traversal(sess, 56434523445, 56434523445, segments=20, inclusivity=(False, True))
+
+		c = self.latent_space_traversal(sess, 56434523445, 6972514296, segments=20, inclusivity=(False, True))
+		c0 = self.latent_space_traversal(sess, 6972514296, 6972514296, segments=20, inclusivity=(False, True))
+
+		d = self.latent_space_traversal(sess, 6972514296, 8027089512, segments=20, inclusivity=(False, True))
+		d0 = self.latent_space_traversal(sess, 8027089512, 8027089512, segments=20, inclusivity=(False, True))
+
+		e = self.latent_space_traversal(sess, 8027089512, 383, segments=20, inclusivity=(False, True))
+		e0 = self.latent_space_traversal(sess, 383, 383, segments=20, inclusivity=(False, True))
+
+		f = self.latent_space_traversal(sess, 383, 19040, segments=20, inclusivity=(False, True))
+		f0 = self.latent_space_traversal(sess, 19040, 19040, segments=20, inclusivity=(False, True))
+
+		g = self.latent_space_traversal(sess, 19040, 94889, segments=20, inclusivity=(False, True))
+		g0 = self.latent_space_traversal(sess, 94889, 94889, segments=20, inclusivity=(False, True))
+
+		h = self.latent_space_traversal(sess, 94889, 89018, segments=20, inclusivity=(False, True))
+		h0 = self.latent_space_traversal(sess, 89018, 89018, segments=20, inclusivity=(False, True))
+
+		i = self.latent_space_traversal(sess, 89018, 934732, segments=20, inclusivity=(False, True))
+		i0 = self.latent_space_traversal(sess, 934732, 934732, segments=20, inclusivity=(False, True))
+
+		image_sequence = np.concatenate([a, a0, b, b0, c, c0, d, d0, e, e0, f, f0, g, g0, h, h0, i, i0])
+
+		self.save_as_gif(image_sequence, duration=1/30, loops=0, output_directory="testoutput/", filename="latent_space_traversal_3")
 
 
 gan = DCGAN()
