@@ -4,7 +4,7 @@ Deep Convolutional Generative Adversarial Network (DCGAN) for generating pencil 
 Walking Through Latent Space:
 
 
-<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/latent2.gif" width="256">
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/latent5.gif" width="256">
 
 
 (Linear interpolation between feature vectors projected onto latent space)
