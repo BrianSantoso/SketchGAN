@@ -13,7 +13,7 @@ The training set consists of 1001 unique grayscale images of pencil sketches of 
 Walking Through Latent Space:
 
 
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/latent_space_traversal_1.gif" width="128">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/latent_space_traversal_1.gif" width="256">
 
 
 Linear interpolation between feature vectors projected onto latent space
