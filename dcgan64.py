@@ -3,6 +3,7 @@ import numpy as np
 import chicken
 import datetime
 import matplotlib.pyplot as plt
+from random import randint
 # from tensorflow.examples.tutorials.mnist import input_data
 
 '''
@@ -133,8 +134,11 @@ class DCGAN:
 		return d6
 
 
-	def generator(self, batch_size, z_dim):
-		z = tf.truncated_normal([batch_size, z_dim], mean=0, stddev=1, name='z')
+	def generator(self, batch_size, z_dim, z_vector=None):
+		if z_vector is not None:
+			z = z_vector
+		else:
+			z = tf.truncated_normal([batch_size, z_dim], mean=0, stddev=1, name='z')
 
 		g_w1 = tf.get_variable('g_w1', [z_dim, 4*4*1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
 		g_b1 = tf.get_variable('g_b1', [4*4*1024], initializer=tf.constant_initializer(0))
@@ -319,29 +323,68 @@ class DCGAN:
 		# real_images = self.mnist.validation.next_batch(10)[0].reshape([10, 28, 28, 1])
 		# real_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: real_images})
 
-		rib = self.sketch_dataset.next_batch(self.batch_size)
-		_, dLossReal, dLossFake, gLoss = sess.run([g_trainer, d_loss_real, d_loss_fake, g_loss], {x_placeholder: rib})
-		print(dLossReal)
-		print(dLossFake)
-		print(gLoss)
+		# rib = self.sketch_dataset.next_batch(self.batch_size)
+		# _, dLossReal, dLossFake, gLoss = sess.run([g_trainer, d_loss_real, d_loss_fake, g_loss], {x_placeholder: rib})
+		# print(dLossReal)
+		# print(dLossFake)
+		# print(gLoss)
 
 
-		test_images = sess.run(self.generator(100, self.z_dimensions))
-		test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
+		# test_images = sess.run(self.generator(100, self.z_dimensions))
+		# test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
 		
-		# # display images and show discriminator's probabilities
-		# for i in range(20):
-		# 	print(test_eval[i])
-		# 	# print(test_images[i])
-		# 	plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
-		# 	plt.show()
+		# # # display images and show discriminator's probabilities
+		# # for i in range(20):
+		# # 	print(test_eval[i])
+		# # 	# print(test_images[i])
+		# # 	plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
+		# # 	plt.show()
 		
-		test_images = chicken.squeeze(test_images)
-		test_images = chicken.data2d_to_grayscale(test_images)
-		chicken.display_all(test_images, 20)
+		# test_images = chicken.squeeze(test_images)
+		# test_images = chicken.data2d_to_grayscale(test_images)
+		# chicken.display_all(test_images, 20)
 
-		total_parameters = self.get_total_parameters()
-		print("total_parameters: ", total_parameters)
+		# total_parameters = self.get_total_parameters()
+		# print("total_parameters: ", total_parameters)
+
+
+		#234534678678
+		#56434523445
+		#6972514296
+		#8027089512
+		#383
+		#19040
+		#94889
+		#89018
+		#934732
+		# for i in range(10):
+		# 	self.latent_space_traversal(sess, segments=19, inclusivity=(True, True))
+
+		a = self.latent_space_traversal(sess, 934732, 234534678678, segments=20, inclusivity=(False, True))
+		b = self.latent_space_traversal(sess, 234534678678, 56434523445, segments=20, inclusivity=(False, True))
+		c = self.latent_space_traversal(sess, 56434523445, 6972514296, segments=20, inclusivity=(False, True))
+		d = self.latent_space_traversal(sess, 6972514296, 8027089512, segments=20, inclusivity=(False, True))
+		e = self.latent_space_traversal(sess, 8027089512, 383, segments=20, inclusivity=(False, True))
+		f = self.latent_space_traversal(sess, 383, 19040, segments=20, inclusivity=(False, True))
+		g = self.latent_space_traversal(sess, 19040, 94889, segments=20, inclusivity=(False, True))
+		h = self.latent_space_traversal(sess, 94889, 89018, segments=20, inclusivity=(False, True))
+		i = self.latent_space_traversal(sess, 89018, 934732, segments=20, inclusivity=(False, True))
+
+		image_sequence = np.concatenate([a, b, c, d, e, f, g, h, i])
+
+		self.save_as_gif(image_sequence, duration=1/30, loops=0, output_directory="testoutput/", filename="latent_space_traversal_1")
+
+
+		# z3 = self.noise(self.z_dimensions, seed=2345656)
+		# test_image3 = sess.run(self.generator(1, self.z_dimensions, z3))
+
+		# interpolation1 = self.interpolate(test_image1[0], test_image2[0], segments=19, inclusivity=(True, True))
+		# interpolation2 = self.interpolate(test_image2[0], test_image3[0], segments=19, inclusivity=(False, True))
+		# interpolation = np.concatenate([interpolation1, interpolation2])
+		# self.display_all(interpolation, 20)
+
+
+
 		# chicken.display_all(np.reshape(test_images, (-1, 256, 256)))
 		# chicken.display_all(np.reshape(self.sketch_dataset.next_batch(10), (-1, 256, 256)))
 
@@ -380,6 +423,55 @@ class DCGAN:
 			total_parameters+=local_parameters
 		return total_parameters
 
+	def interpolate(self, a, b, segments, inclusivity=(False, True)):
+		# Linearly interpolate betweem 2 n-dimensional vectors
+		includeStart, includeEnd = inclusivity
+
+		increment = (b-a)/segments
+		startIndex = 1-int(includeStart)
+		endIndex = segments + int(includeEnd)
+		vectors = [(a + increment*i) for i in range(startIndex, endIndex)]
+
+		return np.array(vectors)
+
+	def latent_space_traversal(self, sess, seed1=None, seed2=None, segments=20, inclusivity=(True, True)):
+
+		seed1 = seed1 if seed1 is not None else randint(0, 1000000)
+		z1 = self.noise(self.z_dimensions, seed=seed1)
+		test_image1 = sess.run(self.generator(1, self.z_dimensions, z1))
+
+		seed2 = seed2 if seed2 is not None else randint(0, 1000000)
+		z2 = self.noise(self.z_dimensions, seed=seed2)
+		test_image2 = sess.run(self.generator(1, self.z_dimensions, z2))
+
+		interpolation = self.interpolate(test_image1[0], test_image2[0], segments=segments, inclusivity=inclusivity)
+		self.display_all(interpolation, 20)
+		print(seed1, seed2)
+		return interpolation
+
+	def noise(self, z_dim, mean=0, stddev=1,seed=None, amount=1):
+
+		output = tf.truncated_normal([amount, z_dim], mean=0, stddev=1, seed=seed) if seed else tf.truncated_normal([z_dim], mean=0, stddev=1)
+
+		return output
+
+	def display_all(self, images, figs_per_page=20):
+
+		images = chicken.squeeze(images)
+		images = chicken.data2d_to_grayscale(images)
+		chicken.display_all(images, figs_per_page)
+		return
+
+	def save_as_gif(self, images, duration=0.1, loops=0, dither=1, output_directory="testoutput/", filename="my_gif"):
+
+		images = chicken.squeeze(images)
+		images = chicken.data2d_to_grayscale(images)
+		images = images * 255
+		images = np.array(images, dtype=np.uint8)
+		chicken.save_as_gif(images=images, duration=duration, loops=loops, output_directory=output_directory, filename=filename)
+
+
+
+
 gan = DCGAN()
 gan.run_session()
-

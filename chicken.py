@@ -12,6 +12,8 @@ from math import sqrt, ceil
 import numpy as np
 import os
 
+
+
 # directory = 'images/'
 # pic = Image.open(directory + '0a847fc4663a23248bcc50235342d7e6.jpg')
 # pix = np.array(pic)
@@ -195,6 +197,16 @@ def squeeze(images):
 
 	return np.array(squeezed)
 
+# def collage(images, dimensions):
+
+# 	if !dimensions:
+# 		dimensions = closest_square_factors(len(images))
+
+# 	width, height = dimensions # (w, h), number of images per dimension
+# 	height_image,  width_image, _ = images[0].shape;
+
+# 	for y in height:
+# 		for x in width:
 
 
 class DataSet:
@@ -239,6 +251,8 @@ def save_to_as(images, directory='testoutput/', prefix='img', file_type='jpg'):
 		image = Image.fromarray(pix)
 		image.save(directory + prefix + str(i) + '.' + str.lower(file_type))
 		i += 1
+
+
 
 
 
@@ -316,3 +330,39 @@ def save_to_as(images, directory='testoutput/', prefix='img', file_type='jpg'):
 # print('Saving...')
 # save_to_as(images64, directory='data64/', prefix='sketch64_', file_type='jpg')
 # print('Saved.')
+
+
+
+
+
+
+
+def save_as_gif(images, duration=0.1, loops=0, output_directory="testoutput/", filename="my_gif"):
+
+
+	# sequence = []
+
+	# im = Image.open(....)
+
+	# im is your original image
+	# frames = [frame.copy() for frame in ImageSequence.Iterator(im)]
+
+	# frames = images
+	# filename = output_directory + filename + '.GIF'
+	# # write GIF animation
+	# fp = open("filename.gif", "wb")
+	# gifmaker.makedelta(fp, frames)
+	# fp.close()
+
+
+
+
+	# print(images.shape)
+	# frames = [Image.fromarray(pix) for pix in images]
+	frames = [Image.fromarray(pix) for pix in images]
+	# frames.save(directory + filename+ '.gif', save_all=true, duration=duration, loop=loops)
+
+	frames[0].save(output_directory + filename + '.gif', save_all=True, append_images=frames[1:], duration=duration, loop=loops)
+
+	
+
