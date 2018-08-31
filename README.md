@@ -25,21 +25,13 @@ The training set consists of 1001 unique grayscale images of pencil sketches of 
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_1.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_2.PNG" width="614">
 
-
-
-
-
-Generated sketches after 299.5k training iterations:
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_1.PNG" width="614">
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_2.PNG" width="614">
-
-
-
 Miscellanious sketches at random training iterations:
 
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_3.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_1.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_2.PNG" width="614">
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_3.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_1.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_2.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_4.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_5.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_6.PNG" width="614">
@@ -55,7 +47,6 @@ Miscellanious sketches at random training iterations:
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_6.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_7.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_8.PNG" width="614">
-
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/79500_3.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_3.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_4.PNG" width="614">
