@@ -7,7 +7,7 @@ Walking Through Latent Space:
 <img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/latent2.gif" width="256">
 
 
-(Linear interpolation between vectors in latent space)
+(Linear interpolation between latent vectors)
 
 
 The model contains a total of 24,216,196 trainable parameters.
