@@ -35,8 +35,8 @@ Miscellanious sketches at random training iterations:
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_1.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_2.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_10.PNG" width="614">
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_11.PNG" width="614">
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_12.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_11.png" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_12.png" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_1.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/299500_2.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_4.PNG" width="614">
