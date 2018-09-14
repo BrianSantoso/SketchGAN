@@ -149,17 +149,21 @@ def grayscale_to_2d(images):
 
 	return np.asarray(data_2d, dtype=np.uint8)
 
-def display_many(images, columns=4, rows=5, figure_size=(8, 8)):
+def display_many(images, columns=4, rows=5, figure_size=(8, 8), titles=None):
 
 	fig=plt.figure(figsize=figure_size)
 
 	for i in range(1, columns*rows+1):
-			fig.add_subplot(rows, columns, i)
+			a = fig.add_subplot(rows, columns, i)
+
+			if titles is not None:
+				a.title.set_text(str(titles[i-1]))
+
 			plt.imshow(images[i-1])
 
 	plt.show()
 
-def display_all(images, figs_per_screen=20):
+def display_all(images, figs_per_screen=20, titles=None):
 
 	n = len(images)
 	figs_per_screen = min(n, figs_per_screen)
@@ -167,13 +171,13 @@ def display_all(images, figs_per_screen=20):
 	for i in range(int(n/figs_per_screen)):
 
 		columns, rows = closest_square_factors(figs_per_screen)
-		display_many(images[i*figs_per_screen : (i+1)*figs_per_screen], columns=columns, rows=rows)
+		display_many(images[i*figs_per_screen : (i+1)*figs_per_screen], columns=columns, rows=rows, titles=titles)
 
 	# leftovers
 	num_leftover = n % figs_per_screen
 	if num_leftover != 0:
 		columns, rows = closest_square_factors(num_leftover)
-		display_many(images[(i+1)*figs_per_screen:], columns=columns, rows=rows)
+		display_many(images[(i+1)*figs_per_screen:], columns=columns, rows=rows, titles=titles)
 
 def data2d_to_grayscale(data2d):
 

@@ -121,9 +121,11 @@ class DCGAN:
 		return d6
 
 
-	def generator(self, batch_size, z_dim, z_vector=None):
+	def generator(self, batch_size, z_dim, z_vector=None, seed=None, training=True):
 		if z_vector is not None:
 			z = z_vector
+		elif seed is not None:
+			z = self.noise(z_dim, seed=seed, amount=batch_size)
 		else:
 			z = tf.truncated_normal([batch_size, z_dim], mean=0, stddev=1, name='z')
 
@@ -131,7 +133,7 @@ class DCGAN:
 		g_b1 = tf.get_variable('g_b1', [4*4*1024], initializer=tf.constant_initializer(0))
 		g1 = tf.matmul(z, g_w1) + g_b1
 		g1 = tf.reshape(g1, [-1, 4, 4, 1024])
-		g1 = tf.contrib.layers.batch_norm(g1, epsilon=1e-5, scope='bn1')
+		g1 = tf.contrib.layers.batch_norm(g1, epsilon=1e-5, scope='bn1', is_training=training)
 		g1 = tf.nn.relu(g1)
 
 		g_w2 = tf.get_variable('g_w2', [5, 5, 512, 1024], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
@@ -141,7 +143,7 @@ class DCGAN:
 		g2 = tf.nn.conv2d_transpose(g1, g_w2, output_shape=[batch_size, 8, 8, 512], strides=[1, 2, 2, 1])
 		g2 = g2 + g_b2 #tf.nn.bias_add?
 		# g2 = tf.reshape(tf.nn.bias_add(g2, g_b2), g2.get_shape())
-		g2 = tf.contrib.layers.batch_norm(g2, epsilon=1e-5, scope='bn2')
+		g2 = tf.contrib.layers.batch_norm(g2, epsilon=1e-5, scope='bn2', is_training=training)
 		g2 = tf.nn.relu(g2)
 
 		g_w3 = tf.get_variable('g_w3', [5, 5, 256, 512], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
@@ -149,7 +151,7 @@ class DCGAN:
 		g3 = tf.nn.conv2d_transpose(g2, g_w3, output_shape=[batch_size, 16, 16, 256], strides=[1, 2, 2, 1])
 		g3 = g3 + g_b3
 		# g3 = tf.reshape(tf.nn.bias_add(g3, g_b3), g3.get_shape())
-		g3 = tf.contrib.layers.batch_norm(g3, epsilon=1e-5, scope='bn3')
+		g3 = tf.contrib.layers.batch_norm(g3, epsilon=1e-5, scope='bn3', is_training=training)
 		g3 = tf.nn.relu(g3)
 
 		g_w4 = tf.get_variable('g_w4', [5, 5, 128, 256], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
@@ -157,7 +159,7 @@ class DCGAN:
 		g4 = tf.nn.conv2d_transpose(g3, g_w4, output_shape=[batch_size, 32, 32, 128], strides=[1, 2, 2, 1])
 		g4 = g4 + g_b4
 		# g4 = tf.reshape(tf.nn.bias_add(g4, g_b4), g4.get_shape())
-		g4 = tf.contrib.layers.batch_norm(g4, epsilon=1e-5, scope='bn4')
+		g4 = tf.contrib.layers.batch_norm(g4, epsilon=1e-5, scope='bn4', is_training=training)
 		g4 = tf.nn.relu(g4)
 
 		g_w5 = tf.get_variable('g_w5', [5, 5, 1, 128], dtype=tf.float32, initializer=tf.truncated_normal_initializer(stddev=0.02))
@@ -231,7 +233,7 @@ class DCGAN:
 
 
 
-		self.saver = tf.train.Saver(max_to_keep=3)
+		self.saver = tf.train.Saver(max_to_keep=3, keep_checkpoint_every_n_hours=2)
 		
 		sess.run(tf.global_variables_initializer())
 
@@ -310,6 +312,7 @@ class DCGAN:
 		# real_images = self.mnist.validation.next_batch(10)[0].reshape([10, 28, 28, 1])
 		# real_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: real_images})
 
+		# # Here
 		# rib = self.sketch_dataset.next_batch(self.batch_size)
 		# _, dLossReal, dLossFake, gLoss = sess.run([g_trainer, d_loss_real, d_loss_fake, g_loss], {x_placeholder: rib})
 		# print(dLossReal)
@@ -317,22 +320,26 @@ class DCGAN:
 		# print(gLoss)
 
 
-		# test_images = sess.run(self.generator(100, self.z_dimensions))
-		# test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
-		
-		# # # display images and show discriminator's probabilities
-		# # for i in range(20):
-		# # 	print(test_eval[i])
-		# # 	# print(test_images[i])
-		# # 	plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
-		# # 	plt.show()
+		test_images = sess.run(self.generator(100, self.z_dimensions))
+		test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
+		# self.display_all(test_images, titles=test_eval)
+		self.display_all(test_images)
+
+		# # display images and show discriminator's probabilities
+		# for i in range(20):
+		# 	print(test_eval[i])
+		# 	# print(test_images[i])
+		# 	plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
+		# 	plt.show()
 		
 		# test_images = chicken.squeeze(test_images)
 		# test_images = chicken.data2d_to_grayscale(test_images)
 		# chicken.display_all(test_images, 20)
 
-		# total_parameters = self.get_total_parameters()
-		# print("total_parameters: ", total_parameters)
+		total_parameters = self.get_total_parameters()
+		print("total_parameters: ", total_parameters)
+
+		# self.test_interpolation_sequence_2(sess)
 
 
 		#234534678678
@@ -347,7 +354,8 @@ class DCGAN:
 		# for i in range(10):
 		# 	self.latent_space_traversal(sess, segments=19, inclusivity=(True, True))
 
-		self.test_interpolation_sequence_1(sess)
+		# self.test_interpolation_sequence_1(sess)
+		# self.test_interpolation_sequence_2(sess)
 
 
 		# z3 = self.noise(self.z_dimensions, seed=2345656)
@@ -422,21 +430,22 @@ class DCGAN:
 		interpolation = self.interpolate(test_image1[0], test_image2[0], segments=segments, inclusivity=inclusivity)
 		
 		if display:
-			self.display_all(interpolation, 20)
 			print(seed1, seed2)
+			self.display_all(interpolation, 20)
+			
 		return interpolation
 
 	def noise(self, z_dim, mean=0, stddev=1,seed=None, amount=1):
 
-		output = tf.truncated_normal([amount, z_dim], mean=0, stddev=1, seed=seed) if seed else tf.truncated_normal([z_dim], mean=0, stddev=1)
+		output = tf.truncated_normal([amount, z_dim], mean=0, stddev=1, seed=seed) if seed is not None else tf.truncated_normal([z_dim], mean=0, stddev=1)
 
 		return output
 
-	def display_all(self, images, figs_per_page=20):
+	def display_all(self, images, figs_per_page=20, titles=None):
 
 		images = chicken.squeeze(images)
 		images = chicken.data2d_to_grayscale(images)
-		chicken.display_all(images, figs_per_page)
+		chicken.display_all(images, figs_per_page, titles)
 		return
 
 	def save_as_gif(self, images, duration=0.1, loops=0, dither=1, output_directory="testoutput/", filename="my_gif"):
@@ -448,7 +457,85 @@ class DCGAN:
 		chicken.save_as_gif(images=images, duration=duration, loops=loops, output_directory=output_directory, filename=filename)
 		return
 
-	def test_interpolation_sequence_1(self, sess):
+	def display_random_images_with_seeds(self, sess, num_images=7):
+
+		seeds = [randint(0, 1000000)]
+		# seeds = [1234]
+		z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=1)
+		test_images = sess.run(self.generator(1, self.z_dimensions, z_vector))
+		for i in range(1, num_images):
+			seed = randint(0, 1000000)
+			# seed = 1234
+			z_vector = self.noise(self.z_dimensions, seed=seed, amount=1)
+			seeds.append(seed)
+
+			im = sess.run(self.generator(1, self.z_dimensions, z_vector))
+			test_images = np.concatenate([test_images, im])
+
+		seeds = np.array(seeds)
+		
+		# print('seeds for displayed images: ', seeds)
+		self.display_all(test_images, titles=seeds)
+		return seeds
+
+	def test_interpolation_sequence_2(self, sess):
+		'''
+
+			934732 - dog in hoodie
+			6972514296 - skull face
+			94889 - eye
+
+			92926 - weird girl 1
+			601024 - weird girl 2
+			414795 - baby elephant thing
+			148055 - eye 1
+			716667 - eye 2
+			917267 - eye plant thing
+			351686 - weird girl 3
+
+		'''
+
+		'''
+			811844 - half girl
+		'''
+
+		# for i in range(10):
+		# 	self.display_random_images_with_seeds(sess, num_images=20)
+
+		# a = self.latent_space_traversal(sess, 811844, 811844, segments=1, inclusivity=(False, True))
+		# self.display_all(a)		
+
+		# a = self.latent_space_traversal(sess, 92926, 601024, segments=20, inclusivity=(False, True))
+		# b = self.latent_space_traversal(sess, 601024, 414795, segments=20, inclusivity=(False, True))
+		# c = self.latent_space_traversal(sess, 414795, 148055, segments=20, inclusivity=(False, True))
+		# d = self.latent_space_traversal(sess, 148055, 716667, segments=20, inclusivity=(False, True))
+		# e = self.latent_space_traversal(sess, 716667, 917267, segments=20, inclusivity=(False, True))
+		# e = self.latent_space_traversal(sess, 917267, 92926, segments=20, inclusivity=(False, True))
+		
+
+		# image_sequence = np.concatenate([a, a0, b, b0, c, c0, d, d0, e, e0, f, f0, g, g0, h, h0, i, i0])
+		# image_sequence = np.concatenate([a, b, c, d, e])
+
+		# image_sequence = chicken.squeeze(image_sequence)
+		# image_sequence = chicken.data2d_to_grayscale(image_sequence)
+		# image_sequence = image_sequence * 255
+		# image_sequence = np.array(image_sequence, dtype=np.uint8)
+
+
+		# image_sequence = self.latent_space_traversal(sess, 217149, 217149, segments=5, inclusivity=(True, False))
+		# self.display_all(image_sequence)
+
+		# seeds = self.display_random_images_with_seeds(sess, num_images=9)
+		# print('seeds: ', seeds)
+		# # z_vector = self.noise(self.z_dimensions, seed=seeds[4], amount=1)
+		# # im = sess.run(self.generator(1, self.z_dimensions, z_vector))
+		# im = sess.run(self.generator(1, self.z_dimensions, seed=seeds[4]))
+		# self.display_all(im)
+
+		# chicken.save_to_as(image_sequence, directory='testoutput2/test5/', prefix='imgif', file_type='jpg')
+		# self.save_as_gif(image_sequence, duration=1/30, loops=0, output_directory="testoutput/", filename="latent_space_traversal_3")
+
+	def test_interpolation_sequence1(self, sess):
 		a = self.latent_space_traversal(sess, 934732, 234534678678, segments=60, inclusivity=(False, True))
 		a0 = self.latent_space_traversal(sess, 234534678678, 234534678678, segments=20, inclusivity=(False, True))
 
@@ -483,10 +570,6 @@ class DCGAN:
 		image_sequence = chicken.data2d_to_grayscale(image_sequence)
 		image_sequence = image_sequence * 255
 		image_sequence = np.array(image_sequence, dtype=np.uint8)
-
-		# chicken.save_to_as(image_sequence, directory='testoutput2/test5/', prefix='imgif', file_type='jpg')
-		# self.save_as_gif(image_sequence, duration=1/30, loops=0, output_directory="testoutput/", filename="latent_space_traversal_3")
-
 
 gan = DCGAN()
 gan.run_session()
