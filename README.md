@@ -16,8 +16,14 @@ The final layer of the generator network utilizes a sigmoid function that is str
 
 The training set consists of 1001 unique grayscale images of pencil sketches of birds, horses, butterflies, disney characters, male and female faces, flowers, hearts, hands, still life, and other miscellanious objects. The image data was also flipped across the vertical axis to produce a total of 2002 pencil sketches.
 
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/565000_5.png" width="614">
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/499500_11.png" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_7.PNG" width="614">
-(generated sketches after 363k training iterations)
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/499500_12.png" width="614">
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/499500_13.png" width="614">
+
+
+Generated sketches after 363k training iterations:
 
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_6.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_1.PNG" width="614">
@@ -55,3 +61,10 @@ Miscellanious sketches at random training iterations:
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_3.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_4.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/100000_5.PNG" width="614">
+
+
+
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/565000_5.png" width="614">
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/499500_11.png" width="614">
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/499500_12.png" width="614">
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/499500_13.png" width="614">
