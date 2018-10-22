@@ -23,18 +23,26 @@ The training set consists of 1001 unique grayscale images of pencil sketches of 
 <img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/499500_13.png" width="614">
 
 
-Generated sketches after 363k training iterations:
-
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_6.PNG" width="614">
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_1.PNG" width="614">
-<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_2.PNG" width="614">
-
 Miscellanious sketches at random training iterations:
 
 
 <img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/imgif1.jpg" width="128">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/imgif837.jpg" width="128">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/imgif225.jpg" width="128">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_1.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_2.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_3.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_4.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_5.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_6.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_7.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_8.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_figures_with_seeds_1.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_figures_with_seeds_2.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_figures_with_seeds_3.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_figures_with_seeds_4.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_figures_with_seeds_5.PNG" width="614">
+<img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/605000_figures_with_seeds_6.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_3.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_1.PNG" width="614">
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/499500_2.PNG" width="614">
