@@ -36,8 +36,8 @@ class DCGAN:
 		self.sketch_dataset = chicken.DataSet(self.load_data())
 
 		
-		self.iterations = 499500
-		self.load_from_ckpt = 499500
+		self.iterations = 605000
+		self.load_from_ckpt = 605000
 
 		self.batch_size = 16
 		self.z_dimensions = 100
@@ -233,7 +233,8 @@ class DCGAN:
 
 
 
-		self.saver = tf.train.Saver(max_to_keep=3, keep_checkpoint_every_n_hours=2)
+		# self.saver = tf.train.Saver(max_to_keep=3, keep_checkpoint_every_n_hours=2)
+		self.saver = tf.train.Saver(max_to_keep=2)
 		
 		sess.run(tf.global_variables_initializer())
 
@@ -319,11 +320,11 @@ class DCGAN:
 		# print(dLossFake)
 		# print(gLoss)
 
-
-		test_images = sess.run(self.generator(100, self.z_dimensions))
-		test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
-		# self.display_all(test_images, titles=test_eval)
-		self.display_all(test_images)
+		#this
+		# test_images = sess.run(self.generator(500, self.z_dimensions))
+		# test_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: test_images})
+		# # self.display_all(test_images, titles=test_eval)
+		# self.display_all(test_images)
 
 		# # display images and show discriminator's probabilities
 		# for i in range(20):
@@ -336,9 +337,17 @@ class DCGAN:
 		# test_images = chicken.data2d_to_grayscale(test_images)
 		# chicken.display_all(test_images, 20)
 
-		total_parameters = self.get_total_parameters()
-		print("total_parameters: ", total_parameters)
+		# total_parameters = self.get_total_parameters()
+		# print("total_parameters: ", total_parameters)
 
+		# seeds = [58502]
+		# z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=1)
+		# im = sess.run(self.generator(1, self.z_dimensions, z_vector))
+		# test_images = im
+		# self.display_all(test_images[:1], titles=seeds)
+		
+		#this
+		self.display_random_images_with_seeds(sess, num_images=100)
 		# self.test_interpolation_sequence_2(sess)
 
 
@@ -459,17 +468,27 @@ class DCGAN:
 
 	def display_random_images_with_seeds(self, sess, num_images=7):
 
+		# IMPORTANT
+		# Generates extra unused images in each run to
+		# prevent noise from batch norm layers
+
 		seeds = [randint(0, 1000000)]
 		# seeds = [1234]
-		z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=1)
-		test_images = sess.run(self.generator(1, self.z_dimensions, z_vector))
+		# z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=1)
+		z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=self.batch_size)
+		test_images = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
+		test_images = test_images[:1] # only get the first image
 		for i in range(1, num_images):
 			seed = randint(0, 1000000)
 			# seed = 1234
-			z_vector = self.noise(self.z_dimensions, seed=seed, amount=1)
+			# z_vector = self.noise(self.z_dimensions, seed=seed, amount=1)
+			z_vector = self.noise(self.z_dimensions, seed=seed, amount=self.batch_size)
 			seeds.append(seed)
 
-			im = sess.run(self.generator(1, self.z_dimensions, z_vector))
+			# im = sess.run(self.generator(1, self.z_dimensions, z_vector))
+			# Use batch_size to prevent noise from batch norm layers
+			im = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
+			im = im[:1] # only get the first image
 			test_images = np.concatenate([test_images, im])
 
 		seeds = np.array(seeds)
@@ -493,10 +512,14 @@ class DCGAN:
 			917267 - eye plant thing
 			351686 - weird girl 3
 
+
 		'''
 
 		'''
 			811844 - half girl
+
+			769513 weird doggo
+			687290 - einstein monkey
 		'''
 
 		# for i in range(10):
