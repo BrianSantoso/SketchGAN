@@ -171,13 +171,13 @@ def display_all(images, figs_per_screen=20, titles=None):
 	for i in range(int(n/figs_per_screen)):
 
 		columns, rows = closest_square_factors(figs_per_screen)
-		display_many(images[i*figs_per_screen : (i+1)*figs_per_screen], columns=columns, rows=rows, titles=titles)
+		display_many(images[i*figs_per_screen : (i+1)*figs_per_screen], columns=columns, rows=rows, titles=titles[i*figs_per_screen : (i+1)*figs_per_screen])
 
 	# leftovers
 	num_leftover = n % figs_per_screen
 	if num_leftover != 0:
 		columns, rows = closest_square_factors(num_leftover)
-		display_many(images[(i+1)*figs_per_screen:], columns=columns, rows=rows, titles=titles)
+		display_many(images[(i+1)*figs_per_screen:], columns=columns, rows=rows, titles=titles[(i+1)*figs_per_screen:])
 
 def data2d_to_grayscale(data2d):
 

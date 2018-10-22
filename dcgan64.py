@@ -327,8 +327,7 @@ class DCGAN:
 		# total_parameters = self.get_total_parameters()
 		# print("total_parameters: ", total_parameters)
 
-		self.display_random_images_with_seeds(sess, num_images=20)
-
+		self.display_random_images_with_seeds(sess, num_images=100)
 
 	def save(self, sess, dir, iteration):
 		save_path = self.saver.save(sess, dir, global_step=iteration)
