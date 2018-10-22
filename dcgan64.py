@@ -283,20 +283,12 @@ class DCGAN:
 				print('TRAINING STEP', i, 'AT', datetime.datetime.now())
 				for j in range(1):
 					print('Discriminator classification', d_result[j])
-					# im = 1-images[j, :, :, 0]
-					# plt.imshow(im.reshape([28, 28]), cmap='Greys')
-					# plt.ion()
-					# plt.imshow(im, cmap='Greys')
-					# plt.show()
-					# plt.plot(im)
-					# plt.draw()
-					# plt.show(block=False)
 
 			# if i == 15000 or i == 5000:
 			# 	images = sess.run(self.generator(3, self.z_dimensions))
 			# 	d_result = sess.run(self.discriminator(x_placeholder), {x_placeholder: images})
 			# 	for j in range(3):
-			# 		print('Discriminator classificationnnnnnnnnn', d_result[j])
+			# 		print('Discriminator classification', d_result[j])
 			# 		im = 1-images[j, :, :, 0]
 			# 		plt.imshow(im.reshape([64, 64]), cmap='Greys')
 			# 		plt.show()
@@ -313,7 +305,6 @@ class DCGAN:
 		# real_images = self.mnist.validation.next_batch(10)[0].reshape([10, 28, 28, 1])
 		# real_eval = sess.run(self.discriminator(x_placeholder), {x_placeholder: real_images})
 
-		# # Here
 		# rib = self.sketch_dataset.next_batch(self.batch_size)
 		# _, dLossReal, dLossFake, gLoss = sess.run([g_trainer, d_loss_real, d_loss_fake, g_loss], {x_placeholder: rib})
 		# print(dLossReal)
@@ -333,64 +324,11 @@ class DCGAN:
 		# 	plt.imshow(1-test_images[i, :, :, 0], cmap='Greys')
 		# 	plt.show()
 		
-		# test_images = chicken.squeeze(test_images)
-		# test_images = chicken.data2d_to_grayscale(test_images)
-		# chicken.display_all(test_images, 20)
-
 		# total_parameters = self.get_total_parameters()
 		# print("total_parameters: ", total_parameters)
 
-		# seeds = [58502]
-		# z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=1)
-		# im = sess.run(self.generator(1, self.z_dimensions, z_vector))
-		# test_images = im
-		# self.display_all(test_images[:1], titles=seeds)
-		
-		#this
-		self.display_random_images_with_seeds(sess, num_images=100)
-		# self.test_interpolation_sequence_2(sess)
+		self.display_random_images_with_seeds(sess, num_images=20)
 
-
-		#234534678678
-		#56434523445
-		#6972514296
-		#8027089512
-		#383
-		#19040
-		#94889
-		#89018
-		#934732
-		# for i in range(10):
-		# 	self.latent_space_traversal(sess, segments=19, inclusivity=(True, True))
-
-		# self.test_interpolation_sequence_1(sess)
-		# self.test_interpolation_sequence_2(sess)
-
-
-		# z3 = self.noise(self.z_dimensions, seed=2345656)
-		# test_image3 = sess.run(self.generator(1, self.z_dimensions, z3))
-
-		# interpolation1 = self.interpolate(test_image1[0], test_image2[0], segments=19, inclusivity=(True, True))
-		# interpolation2 = self.interpolate(test_image2[0], test_image3[0], segments=19, inclusivity=(False, True))
-		# interpolation = np.concatenate([interpolation1, interpolation2])
-		# self.display_all(interpolation, 20)
-
-
-
-		# chicken.display_all(np.reshape(test_images, (-1, 256, 256)))
-		# chicken.display_all(np.reshape(self.sketch_dataset.next_batch(10), (-1, 256, 256)))
-
-		# asdf = self.sketch_dataset.next_batch(10)
-		# for i in range(10):
-		# 	print(asdf[i])
-		# 	plt.imshow(1-asdf[i, :, :, 0], cmap='Greys')
-		# 	plt.show()
-
-		# # Now do the same for real MNIST images
-		# for i in range(10):
-		#     print(real_eval[i])
-		#     plt.imshow(real_images[i, :, :, 0], cmap='Greys')
-		#     plt.show()
 
 	def save(self, sess, dir, iteration):
 		save_path = self.saver.save(sess, dir, global_step=iteration)
@@ -401,6 +339,32 @@ class DCGAN:
 		self.saver.restore(sess, prefix)
 		print("Model restored.")
 		return
+
+	def get_image_from_seed(self, sess, seed):
+
+		# IMPORTANT
+		# Generates extra images (batch_size amount) to prevent
+		# noise issues from batch norm layers
+
+		z_vector = self.noise(self.z_dimensions, seed=seed, amount=self.batch_size)
+		images = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector, seed=seed))
+		first_image = images[0]
+		return first_image
+
+	def get_images_from_seeds(self, sess, seeds):
+
+		# IMPORTANT
+		# Generates extra images (batch_size amount) to prevent
+		# noise issues from batch norm layers
+
+		images = []
+
+		for seed in seeds:
+
+			image = self.get_image_from_seed(sess, seed)
+			images.append(image)
+
+		return np.asarray(images)
 
 	def get_total_parameters(self):
 		total_parameters = 0
@@ -466,35 +430,34 @@ class DCGAN:
 		chicken.save_as_gif(images=images, duration=duration, loops=loops, output_directory=output_directory, filename=filename)
 		return
 
-	def display_random_images_with_seeds(self, sess, num_images=7):
+	def display_image_from_seed(self, sess, seed, title=True):
+		image = self.get_image_from_seed(sess, seed)
+		if title:
+			self.display_all([image], titles=[seed])
+		else:
+			self.display_all([image])
+
+		return image
+
+	def display_images_from_seeds(self, sess, seeds, titles=True):
+
+		images = self.get_images_from_seeds(sess, seeds)
+		if titles:
+			self.display_all(images, titles=seeds)
+		else:
+			self.display_all(images)
+		return images
+
+	def display_random_images_with_seeds(self, sess, num_images=20):
 
 		# IMPORTANT
-		# Generates extra unused images in each run to
-		# prevent noise from batch norm layers
+		# Generates extra images (batch_size amount) to prevent
+		# noise issues from batch norm layers
 
-		seeds = [randint(0, 1000000)]
-		# seeds = [1234]
-		# z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=1)
-		z_vector = self.noise(self.z_dimensions, seed=seeds[0], amount=self.batch_size)
-		test_images = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
-		test_images = test_images[:1] # only get the first image
-		for i in range(1, num_images):
-			seed = randint(0, 1000000)
-			# seed = 1234
-			# z_vector = self.noise(self.z_dimensions, seed=seed, amount=1)
-			z_vector = self.noise(self.z_dimensions, seed=seed, amount=self.batch_size)
-			seeds.append(seed)
+		seeds = [randint(0, 1000000) for i in range(num_images)]
+		images = self.get_images_from_seeds(sess, seeds)
+		self.display_all(images, titles=seeds)
 
-			# im = sess.run(self.generator(1, self.z_dimensions, z_vector))
-			# Use batch_size to prevent noise from batch norm layers
-			im = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
-			im = im[:1] # only get the first image
-			test_images = np.concatenate([test_images, im])
-
-		seeds = np.array(seeds)
-		
-		# print('seeds for displayed images: ', seeds)
-		self.display_all(test_images, titles=seeds)
 		return seeds
 
 	def test_interpolation_sequence_2(self, sess):
