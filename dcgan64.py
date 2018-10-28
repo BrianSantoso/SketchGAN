@@ -333,14 +333,8 @@ class DCGAN:
 		# faces = [695399, 654202]
 		# self.display_images_from_seeds(sess, seeds=[464580, 695399])
 
-		# a = self.noise(z_dim=self.z_dimensions, seed=464580, amount=self.batch_size)
-		# b = self.noise(z_dim=self.z_dimensions, seed=695399, amount=self.batch_size)
-		# z_vector = a + b
-		# ims = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
-		# im = ims[:1]
-		# print(z_vector.get_shape)
-		# print(ims.shape)
-		# self.display_all(im)
+		self.latent_addition_example(sess)
+		
 
 	def save(self, sess, dir, iteration):
 		save_path = self.saver.save(sess, dir, global_step=iteration)
@@ -351,6 +345,41 @@ class DCGAN:
 		self.saver.restore(sess, prefix)
 		print("Model restored.")
 		return
+
+	def latent_addition_example(self, sess, seeds=[464580, 695399]):
+
+		seed1, seed2 = seeds
+		im_1_and_2 = self.get_images_from_seeds(sess, seeds=[seed1, seed2])
+		z1 = self.noise(z_dim=self.z_dimensions, seed=seed1, amount=self.batch_size)
+		z2 = self.noise(z_dim=self.z_dimensions, seed=seed2, amount=self.batch_size)
+		image = self.latent_addition(sess, z1, z2)
+
+		self.display_all(np.concatenate([im_1_and_2, image]), titles=['A', 'B', 'A+B'])
+
+	def latent_addition_from_seeds(self, sess, seed1, seed2):
+
+		# im_1_and_2 = self.get_images_from_seeds(sess, seeds = [seed1, seed2])
+		z1 = self.noise(z_dim=self.z_dimensions, seed=seed1, amount=self.batch_size)
+		z2 = self.noise(z_dim=self.z_dimensions, seed=seed2, amount=self.batch_size)
+		image = self.latent_addition(sess, z1, z2)
+		return image
+
+	def latent_addition(self, sess, z1, z2, first_n=1):
+
+		# seed1 = 464580
+		# seed2 = 695399
+		# im1, im2 = self.get_images_from_seeds(sess, seeds = [seed1, seed2])
+		# a = self.noise(z_dim=self.z_dimensions, seed=seed1, amount=self.batch_size)
+		# b = self.noise(z_dim=self.z_dimensions, seed=seed2, amount=self.batch_size)
+		# z_vector = a + b
+		# images = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
+		# im3 = images[:1]
+		# self.display_all(np.concatenate([[im1, im2], im3]), titles=['A', 'B', 'A+B'])
+
+		z_vector = z1 + z2
+		images = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
+
+		return images[:first_n]
 
 	def get_image_from_seed(self, sess, seed):
 
