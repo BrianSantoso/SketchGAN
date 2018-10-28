@@ -327,7 +327,20 @@ class DCGAN:
 		# total_parameters = self.get_total_parameters()
 		# print("total_parameters: ", total_parameters)
 
-		self.display_random_images_with_seeds(sess, num_images=100)
+		# self.display_random_images_with_seeds(sess, num_images=500)
+
+		# eyes = [464580, 618327]
+		# faces = [695399, 654202]
+		# self.display_images_from_seeds(sess, seeds=[464580, 695399])
+
+		# a = self.noise(z_dim=self.z_dimensions, seed=464580, amount=self.batch_size)
+		# b = self.noise(z_dim=self.z_dimensions, seed=695399, amount=self.batch_size)
+		# z_vector = a + b
+		# ims = sess.run(self.generator(self.batch_size, self.z_dimensions, z_vector))
+		# im = ims[:1]
+		# print(z_vector.get_shape)
+		# print(ims.shape)
+		# self.display_all(im)
 
 	def save(self, sess, dir, iteration):
 		save_path = self.saver.save(sess, dir, global_step=iteration)
@@ -473,13 +486,7 @@ class DCGAN:
 			716667 - eye 2
 			917267 - eye plant thing
 			351686 - weird girl 3
-
-
-		'''
-
-		'''
 			811844 - half girl
-
 			769513 weird doggo
 			687290 - einstein monkey
 		'''
