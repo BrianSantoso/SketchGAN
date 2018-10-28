@@ -19,6 +19,7 @@ The final layer of the generator network utilizes a sigmoid function that is str
 The training set consists of 1001 unique grayscale images of pencil sketches of birds, horses, butterflies, disney characters, male and female faces, flowers, hearts, hands, still life, and other miscellanious objects. The image data was also flipped across the vertical axis to produce a total of 2002 pencil sketches.
 
 Addition of latent space vectors:
+
 <img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/latent_arithmetic_1.png" width="614">
 
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_7.PNG" width="614">
