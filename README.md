@@ -1,5 +1,6 @@
 # SketchGAN
 Deep Convolutional Generative Adversarial Network (DCGAN) for generating pencil sketches
+Written in Python using TensorFlow
 
 Walking Through Latent Space:
 
