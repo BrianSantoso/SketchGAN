@@ -1,5 +1,6 @@
 # SketchGAN
 Deep Convolutional Generative Adversarial Network (DCGAN) for generating pencil sketches
+
 Written in Python using TensorFlow
 
 Walking Through Latent Space:
@@ -16,6 +17,9 @@ The model contains a total of 24,216,196 trainable parameters.
 The final layer of the generator network utilizes a sigmoid function that is stretched by a factor of 5 (by scaling the input by 0.2). This allows the model to more easily learn smooth pencil-like textures (as opposed to crisp, pen-like figures like the digits from the MNIST dataset).
 
 The training set consists of 1001 unique grayscale images of pencil sketches of birds, horses, butterflies, disney characters, male and female faces, flowers, hearts, hands, still life, and other miscellanious objects. The image data was also flipped across the vertical axis to produce a total of 2002 pencil sketches.
+
+Addition of latent space vectors:
+<img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/latent_arithmetic_1.png" width="614">
 
 <img src="https://github.com/BrianSantoso/SketchGAN/blob/master/samples/363000_7.PNG" width="614">
 <img src="https://raw.githubusercontent.com/BrianSantoso/SketchGAN/master/samples/565000_5.png" width="614">
