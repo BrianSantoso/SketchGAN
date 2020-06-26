@@ -9,7 +9,6 @@ from random import randint
 '''
 Helpul Links:
 	https://github.com/llSourcell/Generative_Adversarial_networks_LIVE/blob/master/EZGAN.ipynb
-	-> (fto ix cell 4 in jupyter notebook) https://github.com/llSourcell/Generative_Adversarial_networks_LIVE/issues/2
 	https://github.com/manicman1999/GAN256/blob/master/main.py
 
 	http://cs231n.github.io/neural-networks-2/
